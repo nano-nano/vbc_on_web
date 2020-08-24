@@ -17,6 +17,11 @@
         </thead>
         <tbody>
           <tr>
+            <td v-for="(player, idx2) in players" :key="idx2" class="centering-td" style="padding: 4px;">
+              <small>{{ convertRankNumberToText(player) }}</small>
+            </td>
+          </tr>
+          <tr>
             <td v-for="(player, idx2) in players" :key="idx2" class="centering-td">
               <small>{{ player.belonging }}</small>
             </td>
@@ -171,7 +176,11 @@ export default defineComponent({
           // トビ残り処理
           const remainedPlayers = set
             .filter((player) => player.r2Status.status == WinnedState.UNDEFINED)
-            .sort((playerA, playerB) => playerA.paperRank - playerB.paperRank);
+            .sort((playerA, playerB) => {
+              if (playerA.r2Status.points > playerB.r2Status.points) return -1; // ポイント多い順
+              if (playerA.r2Status.misses < playerB.r2Status.misses) return -1; // 誤答少ない順
+              return playerA.paperRank - playerB.paperRank; // ペーパー上位順
+            });
           for (const player of remainedPlayers) {
             // 勝ち抜け設定
             player.r2Status.status = getWinState(nWinnedPlayer);
@@ -193,11 +202,13 @@ export default defineComponent({
     // console.log(vbcLog);
 
     const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank)
+    const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);
 
     return {
       props,
       setList,
-      getNamePlateClass
+      getNamePlateClass,
+      convertRankNumberToText
     }
   }
 })

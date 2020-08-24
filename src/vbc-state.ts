@@ -15,6 +15,15 @@ export const WinnedState = {
     LOSED: '[LOSE]',
 } as const;
 type WinnedState = typeof WinnedState[keyof typeof WinnedState];
+export const WinnedStateOrder = [
+    WinnedState.UNDEFINED,
+    WinnedState.FIRST_WINNED,
+    WinnedState.SECOND_WINNED,
+    WinnedState.THIRD_WINNED,
+    WinnedState.FOURTH_WINNED,
+    WinnedState.FIFTH_WINNED,
+    WinnedState.LOSED
+];
 
 export const AnswerState = {
     /** 正解 */

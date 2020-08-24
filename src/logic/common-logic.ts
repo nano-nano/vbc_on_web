@@ -1,10 +1,29 @@
 export class NamePlateUtils {
+    /**
+     * ペーパー順位に応じたネームプレート色を返す
+     * 
+     * @param rank ペーパー順位
+     */
     static getBgColorClass(rank: number) {
         if (rank <= 4) return 'bg-danger';
         if (rank <= 12) return 'bg-primary';
         if (rank <= 24) return 'bg-warning';
         if (rank <= 48) return 'bg-success';
         return '';
+    }
+
+    /**
+     * ペーパー順位を序数テキストに変換して返します
+     * 
+     * @param rank ペーパー順位
+     */
+    static convertRankNumberToText(rank: number) {
+        const rankLastTwo = rank % 100;
+        if (rankLastTwo >= 11 && rankLastTwo <= 13) return `${rank}th`;
+        if (rank % 10 == 1) return `${rank}st`;
+        if (rank % 10 == 2) return `${rank}nd`;
+        if (rank % 10 == 3) return `${rank}rd`;
+        return `${rank}th`;
     }
 }
 
