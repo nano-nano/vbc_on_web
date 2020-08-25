@@ -5,7 +5,11 @@
     <div class="main-content">
       <div class="container">
         <!-- 参加者データインポート -->
-        <CsvImportView class="item-bottom-margin" @onFileSelected="onImportFileSelected" />
+        <CsvImportView
+          class="item-bottom-margin"
+          :onClearObservable="clearObservable"
+          @onFileSelected="onImportFileSelected"
+        />
 
         <!-- 未インポート時の案内 -->
         <div v-if="!state.isFileLoaded" class="item-bottom-margin alert alert-primary" role="alert">
@@ -54,6 +58,7 @@ import NavBar from '@/components/NavBar.vue';
 import CsvImportView from '@/components/Home/CsvImportView.vue';
 import PaperResult from '@/components/Home/PaperResult.vue';
 import Round2Result from '@/components/Home/2RResult.vue';
+import { Observable, Observer } from 'rxjs';
 
 export default defineComponent({
   components: {
@@ -67,28 +72,36 @@ export default defineComponent({
       isFileLoaded: boolean;
       playerdataList: PlayerEntity[];
       vbcLogList: string[];
+      clearObserver: Observer<void> | null;
     }>({
       isFileLoaded: false,
       playerdataList: [],
       vbcLogList: [],
+      clearObserver: null
     });
+    const clearObservable = Observable.create((observer: Observer<void>) => (state.clearObserver = observer));
 
     const onImportFileSelected = (playerdataList: PlayerEntity[]) => {
       state.isFileLoaded = false;
       state.playerdataList = playerdataList;
       state.vbcLogList = [];
-      state.isFileLoaded = true;
+      if (playerdataList.length != 0) {
+        state.isFileLoaded = true;
+      }
     }
 
     const onClearClicked = () => {
-      // リロードでクリア
-      location.reload();
+      // 参加者データインポートViewへクリアボタン押下を通知
+      if (state.clearObserver != null) {
+        state.clearObserver.next();
+      }
     }
 
     return {
       state,
+      clearObservable,
       onImportFileSelected,
-      onClearClicked
+      onClearClicked,
     }
   }
 })

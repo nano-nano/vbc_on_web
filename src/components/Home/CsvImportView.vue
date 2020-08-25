@@ -7,19 +7,27 @@
             <button type="button" class="btn btn-primary text-nowrap" @click="onClickFileSelectBtn">ファイル選択</button>
         </div>
         <!-- ファイル選択用（非表示） -->
-        <input style="display: none" ref="input" type="file" accept=".csv" @input="onFileSelect">
+        <input style="display: none" ref="input" type="file" accept=".csv" @change="onFileSelect">
       </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, SetupContext } from "@vue/composition-api";
+import { defineComponent, ref, reactive, SetupContext, onUnmounted } from "@vue/composition-api";
 import { PlayerEntity } from '@/vbc-entity'
+import { Observable } from 'rxjs';
 
 const DEFAULT_FILE_NAME_STR = 'ファイル選択ボタンで選択するか、ここにファイルをドラッグ';
 
+type Props = {
+  onClearObservable: Observable<void>;
+}
+
 export default defineComponent({
-  setup(_, context: SetupContext) {
+  props: {
+    onClearObservable: {}
+  },
+  setup(props: Props, context: SetupContext) {
     const state = reactive({
       importFileName: DEFAULT_FILE_NAME_STR,
     })
@@ -65,6 +73,13 @@ export default defineComponent({
       state.importFileName = files[0].name
       context.emit('onFileSelected', await _convertCsvToPlayerDataList(files[0]));
     }
+
+    // ホーム画面でクリアボタンが押されたことを通知するobservable
+    props.onClearObservable.subscribe(() => {
+      state.importFileName = DEFAULT_FILE_NAME_STR;
+      input.value.value = '';
+      context.emit('onFileSelected', []);
+    });
 
     return {
       state,
