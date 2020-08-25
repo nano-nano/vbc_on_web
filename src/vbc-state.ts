@@ -34,6 +34,14 @@ export const AnswerState = {
     CORRECT_DOUBLE: '◎◎',
     /** アドバンテージ正解 */
     CORRECT_ADVANTAGE: '●',
-
 } as const;
 type AnswerState = typeof AnswerState[keyof typeof AnswerState];
+
+export const Round3Course = {
+    OX: '10○10✕',
+    BY: '10 by 10',
+    SWEDISH: 'Swedish 10',
+    UP_DOWN: '10 up-down',
+} as const;
+type Round3Course = typeof Round3Course[keyof typeof Round3Course];
+export const Round3CourseArray = [ Round3Course.OX, Round3Course.BY, Round3Course.SWEDISH, Round3Course.UP_DOWN ];

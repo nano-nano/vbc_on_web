@@ -97,8 +97,6 @@ export default defineComponent({
     for(let i = 0; i < 48; i++) {
       const player = props.playerList[i];
       setAdvantageValue(player);
-      player.r2Status.misses = 0;
-      player.r2Status.status = WinnedState.UNDEFINED;
       setList[i % 4].push(player);
     }
 

@@ -14,8 +14,9 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, SetupContext, onUnmounted } from "@vue/composition-api";
-import { PlayerEntity } from '@/vbc-entity'
+import { PlayerEntity, Round2Entity, Round3Entity } from '@/vbc-entity'
 import { Observable } from 'rxjs';
+import { WinnedState } from '@/vbc-state';
 
 const DEFAULT_FILE_NAME_STR = 'ファイル選択ボタンで選択するか、ここにファイルをドラッグ';
 
@@ -49,7 +50,20 @@ export default defineComponent({
           request10by10: parseInt(lineItems[6]),
           request10updown: parseInt(lineItems[7]),
           belonging: (lineItems[8] ? lineItems[8] : '-'),
-          r2Status: {},
+          r2Status: {
+            points: 0,
+            misses: 0,
+            answered: '',
+            status: WinnedState.UNDEFINED
+          } as Round2Entity,
+          r3Status: {
+            requestCourseArray: [],
+            fixedCourse: '',
+            points: 0,
+            misses: 0,
+            answered: '',
+            status: WinnedState.UNDEFINED
+          } as Round3Entity,
         } as PlayerEntity);
       }
       return result;

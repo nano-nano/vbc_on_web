@@ -1,5 +1,3 @@
-import { WinnedState } from './vbc-state';
-
 /**
  * 参加者の情報を定義するエンティティ
  */
@@ -15,6 +13,7 @@ export interface PlayerEntity {
     belonging?: string;         // (option)所属
 
     r2Status: Round2Entity;
+    r3Status: Round3Entity;
 }
 
 export interface Round2Entity {
@@ -22,4 +21,13 @@ export interface Round2Entity {
     misses: number;    // 誤答数
     answered: string;  // 正誤履歴文字列
     status: string;    // 解答者ステータス
+}
+
+export interface Round3Entity {
+    requestCourseArray: string[];   // コース希望配列
+    fixedCourse: string;            // 確定コース
+    points: number;                 // 正解数
+    misses: number;                 // 誤答数
+    answered: string;               // 正誤履歴文字列
+    status: string;                 // 解答者ステータス
 }

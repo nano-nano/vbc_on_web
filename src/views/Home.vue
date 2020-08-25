@@ -45,6 +45,18 @@
               </b-card-body>
             </b-collapse>
           </b-card>
+
+          <!-- 3R -->
+          <b-card no-body class="item-bottom-margin">
+            <b-card-header header-tag="header" class="p-1" role="tab">
+              <b-button block v-b-toggle.accordion-r3 variant="secondary">Round 3: Number 10結果</b-button>
+            </b-card-header>
+            <b-collapse id="accordion-r3" role="tabpanel">
+              <b-card-body>
+                <Round3Result :playerList="state.playerdataList" />
+              </b-card-body>
+            </b-collapse>
+          </b-card>
         </div>
       </div>
     </div>
@@ -58,6 +70,7 @@ import NavBar from '@/components/NavBar.vue';
 import CsvImportView from '@/components/Home/CsvImportView.vue';
 import PaperResult from '@/components/Home/PaperResult.vue';
 import Round2Result from '@/components/Home/2RResult.vue';
+import Round3Result from '@/components/Home/3RResult.vue';
 import { Observable, Observer } from 'rxjs';
 
 export default defineComponent({
@@ -66,6 +79,7 @@ export default defineComponent({
     CsvImportView,
     PaperResult,
     Round2Result,
+    Round3Result,
   },
   setup() {
     const state = reactive<{
