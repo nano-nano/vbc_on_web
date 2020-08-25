@@ -43,15 +43,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/composition-api";
+import { defineComponent, SetupContext } from "@vue/composition-api";
 import { PlayerEntity } from '@/vbc-entity'
 import { WinnedState, AnswerState } from '@/vbc-state';
 import { NamePlateUtils } from '@/logic/common-logic';
 import { QuizResultUtils } from '@/logic/quiz-logic';
-
-type Props = {
-  playerList: PlayerEntity[];
-}
 
 const getWinState = (nWinner: number) => {
   switch (nWinner) {
@@ -71,8 +67,8 @@ const getWinState = (nWinner: number) => {
 }
 
 const setAdvantageValue = (player: PlayerEntity) => {
-    if (player.paperRank <= 4) {
-      player.r2Status.points = 3;
+  if (player.paperRank <= 4) {
+    player.r2Status.points = 3;
       player.r2Status.answered = AnswerState.CORRECT_ADVANTAGE + AnswerState.CORRECT_ADVANTAGE + AnswerState.CORRECT_ADVANTAGE;
     } else if (player.paperRank <= 12) {
       player.r2Status.points = 2;
@@ -85,12 +81,16 @@ const setAdvantageValue = (player: PlayerEntity) => {
       player.r2Status.answered = '';
     }
 }
+
+type Props = {
+  playerList: PlayerEntity[];
+}
   
 export default defineComponent({
   props: {
     playerList: {},
   },
-  setup(props: Props) {
+  setup(props: Props, context: SetupContext) {
     let vbcLog = '【Round 2: 連答つき５○２×】\n';
     
     const setList: PlayerEntity[][] = [[], [], [], []];
@@ -199,7 +199,7 @@ export default defineComponent({
     }
 
     vbcLog += '【Round 2: 連答つき５○２× おわり】\n';
-    // console.log(vbcLog);
+    context.emit('onFinish2r', vbcLog);
 
     const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank)
     const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);

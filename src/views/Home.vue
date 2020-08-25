@@ -41,7 +41,7 @@
             </b-card-header>
             <b-collapse id="accordion-r2" role="tabpanel">
               <b-card-body>
-                <Round2Result :playerList="state.playerdataList" />
+                <Round2Result :playerList="state.playerdataList" @onFinish2r="onFinish2r" />
               </b-card-body>
             </b-collapse>
           </b-card>
@@ -71,7 +71,7 @@ export default defineComponent({
     const state = reactive<{
       isFileLoaded: boolean;
       playerdataList: PlayerEntity[];
-      vbcLogList: string[];
+      vbcLogList: any;
       clearObserver: Observer<void> | null;
     }>({
       isFileLoaded: false,
@@ -97,11 +97,16 @@ export default defineComponent({
       }
     }
 
+    const onFinish2r = (logStr: string) => {
+      state.vbcLogList.push({ round: '2R', str: logStr });
+    }
+
     return {
       state,
       clearObservable,
       onImportFileSelected,
       onClearClicked,
+      onFinish2r
     }
   }
 })
