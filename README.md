@@ -15,7 +15,7 @@
 
 著作権表示については
 ```
-Copyright (c) 2020 Nano-Nano
+Copyright (c) 2020 Banno Takuya/Nano-Nano
 ```
 とします。
 
