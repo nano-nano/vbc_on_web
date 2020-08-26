@@ -37,6 +37,19 @@ const getRequestCourseArray = (player: PlayerEntity) => {
     .map((item) => item.course)
 }
 
+const handsUp = (player: PlayerEntity, course: string, endCourses: string[]) => {
+  // 既にコースが確定している人は手を挙げない
+  if (player.r3Status.fixedCourse != Round3Course.UNDEFINED) return false; 
+
+  for (const hopeCourse of player.r3Status.requestCourseArray) {
+    if (!endCourses.includes(hopeCourse)) {
+      return hopeCourse == course;
+    }
+  }
+  // 本来ここまで到達することはないが、もし到達してしまった場合はとりあえず挙手する（出られなくなってしまうので）
+  return true;
+}
+
 // const getWinState = (nWinner: number) => {
 //   switch (nWinner) {
 //     case 0:
@@ -73,9 +86,52 @@ export default defineComponent({
         return playerA.paperRank - playerB.paperRank;
       });
     
-    console.log(priorityedPlayerList);
+    // コース抽選
+    const playerFixedCourseList: string[] = []; // 参加者決定済みコース
+    const runningCourseOrder = getCourseOrder();
+    vbcLog += `（コース実施順）${runningCourseOrder[0]} ＞ ${runningCourseOrder[1]} ＞ ${runningCourseOrder[2]} ＞ ${runningCourseOrder[3]}\n`;
 
-    // TODO: コース抽選、挙手シミュレート、参加コース決定
+    // 4コース分のコース組み分け
+    const fixedPlayerIndexList: number[] = [];
+    for (const course of runningCourseOrder) {
+      const coursePlayers: PlayerEntity[] = [];
+      const handsUpPlayerIndexList: number[] = [];
+
+      // 挙手シミュレート
+      for (let i = 0; i < priorityedPlayerList.length; i++) {
+        if (handsUp(priorityedPlayerList[i], course, playerFixedCourseList)) {
+          handsUpPlayerIndexList.push(i);
+        }
+      }
+      
+      let playerCount = 0;
+      // 優先度上位から抽出
+      for (let i = 0; i < priorityedPlayerList.length; i++) {
+        if (!fixedPlayerIndexList.includes(i) && handsUpPlayerIndexList.includes(i) && playerCount < 5) {
+          coursePlayers.push(priorityedPlayerList[i]);
+          playerCount++;
+          fixedPlayerIndexList.push(i);
+        }
+      }
+      // 優先度下位から補充
+      for (let i = priorityedPlayerList.length - 1; i >= 0; i--) {
+        if (!fixedPlayerIndexList.includes(i) && !handsUpPlayerIndexList.includes(i) && playerCount < 5) {
+          coursePlayers.push(priorityedPlayerList[i]);
+          playerCount++;
+          fixedPlayerIndexList.push(i);
+        }
+      }
+
+      // コース確定
+      for (const player of coursePlayers) {
+        player.r3Status.fixedCourse = course;
+      }
+      playerFixedCourseList.push(course);
+    }
+
+    // priorityedPlayerList.forEach((player) => {
+    //   console.log(`player: ${player.name} - ${player.r3Status.fixedCourse}`);
+    // })
 
     // TODO: クイズ実行
 

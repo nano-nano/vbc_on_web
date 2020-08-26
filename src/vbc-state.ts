@@ -38,6 +38,7 @@ export const AnswerState = {
 type AnswerState = typeof AnswerState[keyof typeof AnswerState];
 
 export const Round3Course = {
+    UNDEFINED: 'undefined',
     OX: '10○10✕',
     BY: '10 by 10',
     SWEDISH: 'Swedish 10',

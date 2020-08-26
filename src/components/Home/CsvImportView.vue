@@ -16,7 +16,7 @@
 import { defineComponent, ref, reactive, SetupContext, onUnmounted } from "@vue/composition-api";
 import { PlayerEntity, Round2Entity, Round3Entity } from '@/vbc-entity'
 import { Observable } from 'rxjs';
-import { WinnedState } from '@/vbc-state';
+import { WinnedState, Round3Course } from '@/vbc-state';
 
 const DEFAULT_FILE_NAME_STR = 'ファイル選択ボタンで選択するか、ここにファイルをドラッグ';
 
@@ -58,7 +58,7 @@ export default defineComponent({
           } as Round2Entity,
           r3Status: {
             requestCourseArray: [],
-            fixedCourse: '',
+            fixedCourse: Round3Course.UNDEFINED,
             points: 0,
             misses: 0,
             answered: '',
