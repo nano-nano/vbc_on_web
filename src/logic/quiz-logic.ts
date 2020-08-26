@@ -1,8 +1,9 @@
 import { Random } from './common-logic';
 import { PlayerEntity } from '@/vbc-entity';
+import { WinnedState } from '@/vbc-state';
 
-export type ButtonPushProbabilityFunction = (player: PlayerEntity, difficulty: number, slashPoint: number) => number;
-export type CorrectAnswerProbabilityFunction = (player: PlayerEntity, difficulty: number, slashPoint: number) => number;
+export type ButtonPushProbabilityFunction = (players: PlayerEntity[], index: number, difficulty: number, slashPoint: number) => number;
+export type CorrectAnswerProbabilityFunction = (players: PlayerEntity[], index: number, difficulty: number, slashPoint: number) => number;
 export type OperateQuizResult = {
     pushedPlayerIndex: number;
     isCorrected: boolean;
@@ -20,15 +21,15 @@ export class QuizResultUtils {
 
         // 解答権取得可能性を算出し、解答権取得プレイヤーを決定する
         const buttonProbabilityList = [];
-        for (const player of playerList) {
-            buttonProbabilityList.push(buttonPushProbabilityFunction(player, difficulty, slashPoint))
+        for (let i = 0; i < playerList.length; i++) {
+            buttonProbabilityList.push(buttonPushProbabilityFunction(playerList, i, difficulty, slashPoint));
         }
         const pushedPlayerIndex = this.culculatePushedPlayer(buttonProbabilityList);
         // 問題はスルーになった
         if (pushedPlayerIndex == -1) return { pushedPlayerIndex: pushedPlayerIndex, isCorrected: true } as OperateQuizResult;
 
         // 正解可能性を算出し、正誤を決定する
-        const correctProbability = correctAnswerProbabilityFunction(playerList[pushedPlayerIndex], difficulty, slashPoint)
+        const correctProbability = correctAnswerProbabilityFunction(playerList, pushedPlayerIndex, difficulty, slashPoint);
         const answerValue = Random.getRandom()
         if (answerValue <= correctProbability) {
             // 正解判定
@@ -43,12 +44,13 @@ export class QuizResultUtils {
      * 指定されたプレイヤーの解答権取得可能性を算出する
      * （標準算出ルール: 早押し力算出値に2倍の重み付け付）
      * 
-     * @param player 対象プレイヤー
+     * @param players クイズを解答しているプレイヤーの配列
+     * @param index 対象プレイヤーを特定するindex
      * @param difficulty 問題の難易度値
      * @param slashPoint 問題のスラッシュポイント値
      */
-    static calculateStandardButtonPushProbability(player: PlayerEntity, difficulty: number, slashPoint: number): number {
-        return Math.max(0, (player.knowledge - difficulty)) + Math.max(0, (player.pushSpeed - slashPoint)) * 2;
+    static calculateStandardButtonPushProbability(players: PlayerEntity[], index: number, difficulty: number, slashPoint: number): number {
+        return Math.max(0, (players[index].knowledge - difficulty)) + Math.max(0, (players[index].pushSpeed - slashPoint)) * 2;
     }
 
     /**
@@ -56,24 +58,26 @@ export class QuizResultUtils {
      * （標準算出ルール: 知識力算出値に0.1倍の、早押し力算出値に0.05倍の重み付け付）
      * 
      * @param baseValue 算出基礎値（ルール等により変動）
-     * @param player 対象プレイヤー
+     * @param pKnowledge 対象プレイヤーの知識力
+     * @param pPushSpeed 対象プレイヤーの早押し力
      * @param difficulty 問題の難易度値
      * @param slashPoint 問題のスラッシュポイント値
      */
-    static calculateCorrectAnswerProbability(baseValue: number, player: PlayerEntity, difficulty: number, slashPoint: number): number {
-        return baseValue + (player.knowledge - difficulty) * 0.1 + (player.pushSpeed - slashPoint) * 0.05;
+    static calculateCorrectAnswerProbability(baseValue: number, pKnowledge: number, pPushSpeed: number, difficulty: number, slashPoint: number): number {
+        return baseValue + (pKnowledge - difficulty) * 0.1 + (pPushSpeed - slashPoint) * 0.05;
     }
 
     /**
      * 指定されたプレイヤーの正解可能性を算出する
      * （標準算出ルール & 算出基礎値 = 0.5）
      * 
-     * @param player 対象プレイヤー
+     * @param players クイズを解答しているプレイヤーの配列
+     * @param index 対象プレイヤーを特定するindex
      * @param difficulty 問題の難易度値
      * @param slashPoint 問題のスラッシュポイント値
      */
-    static calculateStandartCorrectAnswerProbability(player: PlayerEntity, difficulty: number, slashPoint: number): number {
-        return QuizResultUtils.calculateCorrectAnswerProbability(0.5, player, difficulty, slashPoint);
+    static calculateStandartCorrectAnswerProbability(players: PlayerEntity[], index: number, difficulty: number, slashPoint: number): number {
+        return QuizResultUtils.calculateCorrectAnswerProbability(0.5, players[index].knowledge, players[index].pushSpeed, difficulty, slashPoint);
     }
 
     /**
@@ -108,5 +112,22 @@ export class QuizResultUtils {
             if (lamp < probabilitySumList[i]) return i;
         }
         return -1; // -1は問題スルーを示す
+    }
+
+    // Round3 ===
+
+    static calculateCorrectAnswerProbabilityFor10o10x(players: PlayerEntity[], index: number, difficulty: number, slashPoint: number): number {
+        let nWinnedPlayers = 0;
+        for (const player of players) {
+            if (player.r3Status.status == WinnedState.FIRST_WINNED || player.r3Status.status == WinnedState.SECOND_WINNED) nWinnedPlayers++;
+        } 
+        const modifiedKnowledge = (nWinnedPlayers == 1) ? players[index].knowledge - 2 : players[index].knowledge - 1;
+        let value = QuizResultUtils.calculateCorrectAnswerProbability(0.45, modifiedKnowledge, players[index].pushSpeed, difficulty, slashPoint);
+        if (10 - players[index].r3Status.misses >= 5) {
+            value /= 1.2;
+        } else if (10 - players[index].r3Status.misses == 1) {
+            value /= 0.75;
+        }
+        return value;
     }
 }

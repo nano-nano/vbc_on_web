@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="set" v-for="(players, idx) in setList" :key="idx">
+    <div v-for="(players, idx) in setList" :key="idx">
       <h4>第{{ (idx + 1) }}セット</h4>
       <table class="table" style="table-layout: fixed;">
         <thead>
@@ -91,6 +91,9 @@ export default defineComponent({
     playerList: {},
   },
   setup(props: Props, context: SetupContext) {
+    const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank);
+    const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);
+
     let vbcLog = '【Round 2: 連答つき５○２×】\n';
     
     const setList: PlayerEntity[][] = [[], [], [], []];
@@ -190,6 +193,7 @@ export default defineComponent({
       const winnerPlayersName = set
         .filter((player) => (player.r2Status.status != WinnedState.UNDEFINED && player.r2Status.status != WinnedState.LOSED))
         .map((player) => player.name);
+      vbcLog += '勝ち抜け ';
       for (const name of winnerPlayersName) {
         vbcLog += `[${name}]`;
       }
@@ -198,9 +202,6 @@ export default defineComponent({
 
     vbcLog += '【Round 2: 連答つき５○２× おわり】\n';
     context.emit('onFinish2r', vbcLog);
-
-    const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank)
-    const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);
 
     return {
       props,
@@ -211,8 +212,3 @@ export default defineComponent({
   }
 })
 </script>
-
-
-<style scoped>
-
-</style>
