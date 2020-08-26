@@ -1,13 +1,53 @@
 <template>
   <div>
+    <div v-for="(course, idx) in runningCourseOrder" :key="idx">
+      <h4>コース{{ (idx + 1) }} : {{ course }}</h4>
+      <table class="table" style="table-layout: fixed;">
+        <thead>
+          <tr>
+            <th 
+              v-for="(player, idx2) in getPlayersByCourse(course)"
+              :key="idx2"
+              class="tate-th"
+              :class="getNamePlateClass(player)"
+            >
+              <span class="tate-span">{{ player.name }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td v-for="(player, idx2) in getPlayersByCourse(course)" :key="idx2" class="centering-td" style="padding: 4px;">
+              <small>{{ convertRankNumberToText(player) }}</small>
+            </td>
+          </tr>
+          <tr>
+            <td v-for="(player, idx2) in getPlayersByCourse(course)" :key="idx2" class="centering-td">
+              <small>{{ player.belonging }}</small>
+            </td>
+          </tr>
+          <tr>
+            <td v-for="(player, idx2) in getPlayersByCourse(course)" :key="idx2" class="centering-td">
+              <small>{{ player.r3Status.answered }}</small>
+            </td>
+          </tr>
+          <tr>
+            <td v-for="(player, idx2) in getPlayersByCourse(course)" :key="idx2" class="centering-td">
+              {{ player.r3Status.status }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, SetupContext } from "@vue/composition-api";
 import { PlayerEntity } from '@/vbc-entity'
-import { WinnedState, WinnedStateOrder, Round3CourseArray, Round3Course } from '@/vbc-state';
+import { WinnedState, WinnedStateOrder, Round3CourseArray, Round3Course, AnswerState } from '@/vbc-state';
 import { Random, NamePlateUtils } from '@/logic/common-logic';
+import { QuizResultUtils } from '@/logic/quiz-logic';
 // import { QuizResultUtils } from '@/logic/quiz-logic';
 
 const getCourseOrder = () => {
@@ -50,16 +90,106 @@ const handsUp = (player: PlayerEntity, course: string, endCourses: string[]) => 
   return true;
 }
 
-// const getWinState = (nWinner: number) => {
-//   switch (nWinner) {
-//     case 0:
-//       return WinnedState.FIRST_WINNED;
-//     case 1:
-//       return WinnedState.SECOND_WINNED;
-//     default:
-//       return '';
-//   }
-// }
+const getWinState = (nWinner: number) => {
+  switch (nWinner) {
+    case 0:
+      return WinnedState.FIRST_WINNED;
+    case 1:
+      return WinnedState.SECOND_WINNED;
+    default:
+      return WinnedState.UNDEFINED;
+  }
+}
+
+const operatePlayOff = (playerA: PlayerEntity, playerB: PlayerEntity) => {
+  const result = QuizResultUtils.operateQuiz([playerA, playerB]);
+  if (result.pushedPlayerIndex == -1) operatePlayOff(playerA, playerB); // スルーの場合は再帰実行
+  if (result.isCorrected) {
+    // どちらかが正解 -> 正解した方が先になるようにする
+    return (result.pushedPlayerIndex == 0) ? -1 : 1;
+  } else {
+    // どちらかが誤答 -> 誤答した方が後になるようにする
+    return (result.pushedPlayerIndex == 0) ? 1 : -1;
+  }
+}
+
+const operate10o10x = (players: PlayerEntity[], vbcLog: string) => {
+  let nWinnedPlayer = 0;
+  let nLosedPlayer = 0;
+  let time = 0;  // コース経過時間（秒）
+
+  while (nWinnedPlayer < 2  && nLosedPlayer < 3 && time < (15 * 60)) { // 15分x60秒
+    const result = QuizResultUtils.operateQuiz(
+      players, 
+      undefined, 
+      QuizResultUtils.calculateCorrectAnswerProbabilityFor10o10x);
+    if (result.pushedPlayerIndex == -1) {
+      // 問題スルー
+      time += Random.getRandomArbitrary(10.5 - 4, 10.5 + 4);
+      vbcLog += `（スルー）\n`;
+      continue;
+    } else if (players[result.pushedPlayerIndex].r3Status.status != WinnedState.UNDEFINED) {
+      // その解答者が既に勝ち抜け or 敗退している
+      continue;
+    } else {
+      // 誰かが解答権を得ている
+      time += Random.getRandomArbitrary(10.5 - 4, 10.5 + 4);
+      vbcLog += `${players[result.pushedPlayerIndex].name} `;
+      if (result.isCorrected) {
+        // 正解した
+        vbcLog += `${AnswerState.CORRECT} `;
+        players[result.pushedPlayerIndex].r3Status.points++;
+        players[result.pushedPlayerIndex].r3Status.answered += AnswerState.CORRECT;
+
+        if (players[result.pushedPlayerIndex].r3Status.points == 10) {
+          // 勝ち抜け
+          vbcLog += `=> ${getWinState(nWinnedPlayer)}`;
+          players[result.pushedPlayerIndex].r3Status.status = getWinState(nWinnedPlayer);
+          nWinnedPlayer++;
+        }
+        vbcLog += '\n';
+      } else {
+        // 誤答した
+        vbcLog += `${AnswerState.INCORRECT} `;
+        players[result.pushedPlayerIndex].r3Status.misses += 1;
+        players[result.pushedPlayerIndex].r3Status.answered += AnswerState.INCORRECT;
+
+        if (players[result.pushedPlayerIndex].r3Status.misses == 10) {
+          // 敗退
+          vbcLog += `=> ${WinnedState.LOSED}`;
+          players[result.pushedPlayerIndex].r3Status.status = WinnedState.LOSED;
+          nLosedPlayer++;
+        }
+        vbcLog += '\n';
+      }
+    }
+  }
+
+  if (nWinnedPlayer < 2) {
+    // トビ残り処理
+    const remainedPlayers = players
+      .filter((player) => player.r3Status.status == WinnedState.UNDEFINED)
+      .sort((playerA, playerB) => {
+        if (playerA.r3Status.points > playerB.r3Status.points) return -1; // ポイント多い順
+        if (playerA.r3Status.misses < playerB.r3Status.misses) return -1; // 誤答少ない順
+        return operatePlayOff(playerA, playerB) // プレーオフ
+      });
+    for (const player of remainedPlayers) {
+      // 勝ち抜け設定
+      player.r3Status.status = getWinState(nWinnedPlayer);
+    }
+  }
+
+  const winnerPlayersName = players
+    .filter((player) => (player.r3Status.status != WinnedState.UNDEFINED && player.r3Status.status != WinnedState.LOSED))
+    .map((player) => player.name);
+  vbcLog += '勝ち抜け ';
+  for (const name of winnerPlayersName) {
+    vbcLog += `[${name}]`;
+  }
+  vbcLog += '\n';
+  return vbcLog;
+}
 
 type Props = {
   playerList: PlayerEntity[];
@@ -70,6 +200,9 @@ export default defineComponent({
     playerList: {},
   },
   setup(props: Props) {
+    const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank);
+    const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);
+
     let vbcLog = '【Round 3: Number 10】\n';
 
     // Round3参加者のコース希望値算出 -> 優先順にソート
@@ -133,16 +266,42 @@ export default defineComponent({
     //   console.log(`player: ${player.name} - ${player.r3Status.fixedCourse}`);
     // })
 
-    // TODO: クイズ実行
+    const getPlayersByCourse = (course: string) => priorityedPlayerList.filter(player => player.r3Status.fixedCourse == course);
+
+    // クイズ実行
+    for (let i = 0; i < runningCourseOrder.length; i++) {
+      vbcLog += `（コース${i + 1} : ${runningCourseOrder[i]}）\n`;
+      for (const player of getPlayersByCourse(runningCourseOrder[i])) {
+        vbcLog += `[${player.name}]`;
+      }
+      vbcLog += '\n';
+
+      switch (runningCourseOrder[i]) {
+        case Round3Course.OX:
+          vbcLog = operate10o10x(getPlayersByCourse(runningCourseOrder[i]), vbcLog);
+          break;
+        case Round3Course.BY:
+          break;
+        case Round3Course.SWEDISH:
+          break;
+        case Round3Course.UP_DOWN:
+          break;
+        default:
+          // ここを通ることは無い
+      }
+    }
+
 
     vbcLog += '【Round 3: Number 10 おわり】\n';
+    console.log(vbcLog);
     // context.emit('onFinish3r', vbcLog);
 
-    const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank)
-    const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);
 
     return {
       props,
+      runningCourseOrder,
+      priorityedPlayerList,
+      getPlayersByCourse,
       getNamePlateClass,
       convertRankNumberToText
     }
