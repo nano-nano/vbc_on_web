@@ -1,3 +1,6 @@
+/**
+ * 勝ち抜け状態
+ */
 export const WinnedState = {
     /** 未確定 */
     UNDEFINED: '',
@@ -15,6 +18,10 @@ export const WinnedState = {
     LOSED: '[LOSE]',
 } as const;
 type WinnedState = typeof WinnedState[keyof typeof WinnedState];
+
+/**
+ * 勝ち抜け順配列
+ */
 export const WinnedStateOrder = [
     WinnedState.UNDEFINED,
     WinnedState.FIRST_WINNED,

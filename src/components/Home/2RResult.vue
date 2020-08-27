@@ -33,7 +33,7 @@
           </tr>
           <tr>
             <td v-for="(player, idx2) in players" :key="idx2" class="centering-td">
-              {{ player.r2Status.status }}
+              <span :class="getWinnedStateLabelStyle(player.r2Status.status)">{{ player.r2Status.status }}</span>
             </td>
           </tr>
         </tbody>
@@ -46,7 +46,7 @@
 import { defineComponent, SetupContext } from "@vue/composition-api";
 import { PlayerEntity } from '@/vbc-entity'
 import { WinnedState, AnswerState } from '@/vbc-state';
-import { NamePlateUtils } from '@/logic/common-logic';
+import { NamePlateUtils, WinnedStateUtils } from '@/logic/common-logic';
 import { QuizResultUtils } from '@/logic/quiz-logic';
 
 const getWinState = (nWinner: number) => {
@@ -93,6 +93,7 @@ export default defineComponent({
   setup(props: Props, context: SetupContext) {
     const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank);
     const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);
+    const getWinnedStateLabelStyle = (state: string) => WinnedStateUtils.getWinnedStateLabelStyle(state);
 
     let vbcLog = '【Round 2: 連答つき５○２×】\n';
     
@@ -207,7 +208,8 @@ export default defineComponent({
       props,
       setList,
       getNamePlateClass,
-      convertRankNumberToText
+      convertRankNumberToText,
+      getWinnedStateLabelStyle
     }
   }
 })

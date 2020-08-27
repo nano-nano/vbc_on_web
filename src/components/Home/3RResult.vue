@@ -33,7 +33,7 @@
           </tr>
           <tr>
             <td v-for="(player, idx2) in getPlayersByCourse(course)" :key="idx2" class="centering-td">
-              {{ player.r3Status.status }}
+              <span :class="getWinnedStateLabelStyle(player.r3Status.status)">{{ player.r3Status.status }}</span>
             </td>
           </tr>
         </tbody>
@@ -46,7 +46,7 @@
 import { defineComponent, SetupContext } from "@vue/composition-api";
 import { PlayerEntity } from '@/vbc-entity'
 import { WinnedState, WinnedStateOrder, Round3CourseArray, Round3Course, AnswerState } from '@/vbc-state';
-import { Random, NamePlateUtils } from '@/logic/common-logic';
+import { Random, NamePlateUtils, WinnedStateUtils } from '@/logic/common-logic';
 import { QuizResultUtils } from '@/logic/quiz-logic';
 // import { QuizResultUtils } from '@/logic/quiz-logic';
 
@@ -487,6 +487,7 @@ export default defineComponent({
   setup(props: Props) {
     const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank);
     const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);
+    const getWinnedStateLabelStyle = (state: string) => WinnedStateUtils.getWinnedStateLabelStyle(state);
 
     let vbcLog = '【Round 3: Number 10】\n';
 
@@ -579,14 +580,14 @@ export default defineComponent({
     // console.log(vbcLog);
     // context.emit('onFinish3r', vbcLog);
 
-
     return {
       props,
       runningCourseOrder,
       priorityedPlayerList,
       getPlayersByCourse,
       getNamePlateClass,
-      convertRankNumberToText
+      convertRankNumberToText,
+      getWinnedStateLabelStyle
     }
   }
 })

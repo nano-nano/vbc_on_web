@@ -1,3 +1,5 @@
+import { WinnedState } from '@/vbc-state';
+
 export class NamePlateUtils {
     /**
      * ペーパー順位に応じたネームプレート色を返す
@@ -24,6 +26,14 @@ export class NamePlateUtils {
         if (rank % 10 == 2) return `${rank}nd`;
         if (rank % 10 == 3) return `${rank}rd`;
         return `${rank}th`;
+    }
+}
+
+export class WinnedStateUtils {
+    static getWinnedStateLabelStyle(state: string) {
+        if (state == WinnedState.LOSED) return 'text-muted' ;
+        if (state == WinnedState.UNDEFINED) return '' ;
+        return 'font-weight-bold';
     }
 }
 
