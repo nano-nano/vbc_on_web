@@ -169,7 +169,7 @@ const operate10o10x = (players: PlayerEntity[], vbcLog: string) => {
   }
 
   if (nWinnedPlayer < 2) {
-    // トビ残り処理
+    // トビ残り・タイムアップ処理
     const remainedPlayers = players
       .filter((player) => player.r3Status.status == WinnedState.UNDEFINED)
       .sort((playerA, playerB) => {
@@ -177,9 +177,10 @@ const operate10o10x = (players: PlayerEntity[], vbcLog: string) => {
         if (playerA.r3Status.misses < playerB.r3Status.misses) return -1; // 誤答少ない順
         return operatePlayOff(playerA, playerB) // プレーオフ
       });
-    for (const player of remainedPlayers) {
+    for (let i = 0; i < (2 - nWinnedPlayer); i++) {
       // 勝ち抜け設定
-      player.r3Status.status = getWinState(nWinnedPlayer);
+      remainedPlayers[i].r3Status.status = getWinState(nWinnedPlayer);
+      nWinnedPlayer++;
     }
   }
 
@@ -257,7 +258,7 @@ const operate10by10 = (players: PlayerEntity[], vbcLog: string) => {
   }
 
   if (nWinnedPlayer < 2) {
-    // トビ残り処理
+    // トビ残り・タイムアップ処理
     const remainedPlayers = players
       .filter((player) => player.r3Status.status == WinnedState.UNDEFINED)
       .sort((playerA, playerB) => {
@@ -265,9 +266,11 @@ const operate10by10 = (players: PlayerEntity[], vbcLog: string) => {
             (playerB.r3Status.points * (10 - playerB.r3Status.misses))) return -1; // 積ポイント多い順
         return operatePlayOff(playerA, playerB) // プレーオフ
       });
-    for (const player of remainedPlayers) {
+    const nRequiredWinner = (2 - nWinnedPlayer);
+    for (let i = 0; i < nRequiredWinner; i++) {
       // 勝ち抜け設定
-      player.r3Status.status = getWinState(nWinnedPlayer);
+      remainedPlayers[i].r3Status.status = getWinState(nWinnedPlayer);
+      nWinnedPlayer++;
     }
   }
 
@@ -346,16 +349,18 @@ const operate10UpDown = (players: PlayerEntity[], vbcLog: string) => {
   }
 
   if (nWinnedPlayer < 2) {
-    // トビ残り処理
+    // トビ残り・タイムアップ処理
     const remainedPlayers = players
       .filter((player) => player.r3Status.status == WinnedState.UNDEFINED)
       .sort((playerA, playerB) => {
         if (playerA.r3Status.points > playerB.r3Status.points) return -1; // ポイント多い順
         return operatePlayOff(playerA, playerB) // プレーオフ
       });
-    for (const player of remainedPlayers) {
+    const nRequiredWinner = (2 - nWinnedPlayer);
+    for (let i = 0; i < nRequiredWinner; i++) {
       // 勝ち抜け設定
-      player.r3Status.status = getWinState(nWinnedPlayer);
+      remainedPlayers[i].r3Status.status = getWinState(nWinnedPlayer);
+      nWinnedPlayer++;
     }
   }
 
@@ -438,7 +443,7 @@ const operateSwedish10 = (players: PlayerEntity[], vbcLog: string) => {
   }
 
   if (nWinnedPlayer < 2) {
-    // トビ残り処理
+    // トビ残り・タイムアップ処理
     const remainedPlayers = players
       .filter((player) => player.r3Status.status == WinnedState.UNDEFINED)
       .sort((playerA, playerB) => {
@@ -446,9 +451,11 @@ const operateSwedish10 = (players: PlayerEntity[], vbcLog: string) => {
         if (playerA.r3Status.misses < playerB.r3Status.misses) return -1; // 誤答少ない順
         return operatePlayOff(playerA, playerB) // プレーオフ
       });
-    for (const player of remainedPlayers) {
+    const nRequiredWinner = (2 - nWinnedPlayer);
+    for (let i = 0; i < nRequiredWinner; i++) {
       // 勝ち抜け設定
-      player.r3Status.status = getWinState(nWinnedPlayer);
+      remainedPlayers[i].r3Status.status = getWinState(nWinnedPlayer);
+      nWinnedPlayer++;
     }
   }
 
