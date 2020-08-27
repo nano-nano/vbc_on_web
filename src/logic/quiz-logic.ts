@@ -192,4 +192,37 @@ export class QuizResultUtils {
         value += nLosedPlayers * 0.08;
         return value;
     }
+
+    static calculateButtonPushProbabilityForSwedish10(players: PlayerEntity[], index: number, difficulty: number, slashPoint: number): number {
+        let value = QuizResultUtils.calculateStandardButtonPushProbability(players, index, difficulty, slashPoint);
+        if (QuizResultUtils.getMissAffordabilityForSedish10(players[index]) == 1) {
+            value *= 0.75;
+        }
+        return value;
+    }
+
+    static calculateCorrectAnswerProbabilityForSwedish10(players: PlayerEntity[], index: number, difficulty: number, slashPoint: number): number {
+        let value = QuizResultUtils.calculateStandartCorrectAnswerProbability(players, index, difficulty, slashPoint);
+        if (QuizResultUtils.getMissAffordabilityForSedish10(players[index]) == 4) {
+            value /= 0.75;
+        }
+        return value;
+    }
+
+    /**
+     * Swedish 10ルール時の、正解・誤答数に応じた恐れの度合いを返す
+     * 
+     * @param player 
+     */
+    static getMissAffordabilityForSedish10(player: PlayerEntity) {
+        const missCount = () => {
+            if (player.r3Status.points == 0) return 1;
+            if (player.r3Status.points <= 2) return 2;
+            if (player.r3Status.points <= 5) return 3;
+            return 4;
+        };
+
+        const remainMisses = 10 - player.r3Status.misses;
+        return (remainMisses + missCount() - 1);
+    }
 }
