@@ -130,4 +130,66 @@ export class QuizResultUtils {
         }
         return value;
     }
+
+    static calculateButtonPushProbabilityFor10by10(players: PlayerEntity[], index: number, difficulty: number, slashPoint: number): number {
+        let value = QuizResultUtils.calculateStandardButtonPushProbability(players, index, difficulty, slashPoint);
+        if (QuizResultUtils.getRequiredCorrectLevelIncreasingFor10by10(players[index]) >= 4) {
+            value *= 0.75;
+        }
+        return value;
+    }
+
+    static calculateCorrectAnswerProbabilityFor10by10(players: PlayerEntity[], index: number, difficulty: number, slashPoint: number): number {
+        let value = QuizResultUtils.calculateStandartCorrectAnswerProbability(players, index, difficulty, slashPoint);
+        if (QuizResultUtils.getRequiredCorrectLevelIncreasingFor10by10(players[index]) >= 4) {
+            value /= 0.75;
+        }
+        return value;
+    }
+
+    /**
+     * 10by10ルール時の、誤答すると仮定しても正解の欲しい度合いを返す
+     * 
+     * @param player 
+     */
+    private static getRequiredCorrectLevelIncreasingFor10by10(player: PlayerEntity) {
+        const currentLevel = this.getRequiredCorrectLevelFor10by10(player.r3Status.points, player.r3Status.misses);
+        const ifMissLevel = this.getRequiredCorrectLevelFor10by10(player.r3Status.points, player.r3Status.misses + 1);
+        return ifMissLevel - currentLevel;
+    }
+
+    /**
+     * 10by10ルール時の、正解の欲しい度合いを返す
+     * 
+     * @param points 
+     * @param misses 
+     */
+    private static getRequiredCorrectLevelFor10by10(points: number, misses: number) {
+        if (misses == 10) return 10000000;
+        const currentScore = points * (10 - misses);
+        return 100 - currentScore + (10 - misses) - 1;
+    }
+
+    static calculateCorrectAnswerProbabilityFor10UpDown(players: PlayerEntity[], index: number, difficulty: number, slashPoint: number): number {
+        let nLosedPlayers = 0;
+        for (const player of players) {
+            if (player.r3Status.status == WinnedState.LOSED) nLosedPlayers++;
+        }
+
+        const modifiedKnowledge = () => {
+            let value = players[index].knowledge;
+            if (players[index].r3Status.points <= 4) {
+                value += 2.5;
+            } else if (players[index].r3Status.points <= 7) {
+                value += 3;
+            } else {
+                value += 3.5;
+            }
+            value += nLosedPlayers;
+            return value;
+        };
+        let value = QuizResultUtils.calculateCorrectAnswerProbability(0.45, modifiedKnowledge(), players[index].pushSpeed, difficulty, slashPoint);
+        value += nLosedPlayers * 0.08;
+        return value;
+    }
 }

@@ -147,7 +147,6 @@ const operate10o10x = (players: PlayerEntity[], vbcLog: string) => {
           players[result.pushedPlayerIndex].r3Status.status = getWinState(nWinnedPlayer);
           nWinnedPlayer++;
         }
-        vbcLog += '\n';
       } else {
         // 誤答した
         vbcLog += `${AnswerState.INCORRECT} `;
@@ -160,8 +159,8 @@ const operate10o10x = (players: PlayerEntity[], vbcLog: string) => {
           players[result.pushedPlayerIndex].r3Status.status = WinnedState.LOSED;
           nLosedPlayer++;
         }
-        vbcLog += '\n';
       }
+      vbcLog += '\n';
     }
   }
 
@@ -178,6 +177,178 @@ const operate10o10x = (players: PlayerEntity[], vbcLog: string) => {
       // 勝ち抜け設定
       player.r3Status.status = getWinState(nWinnedPlayer);
     }
+  }
+
+  for (const player of players) {
+    player.r3Status.answered += ' （' + 
+      player.r3Status.points + AnswerState.CORRECT + 
+      player.r3Status.misses + AnswerState.INCORRECT + '）';
+  }
+
+  const winnerPlayersName = players
+    .filter((player) => (player.r3Status.status != WinnedState.UNDEFINED && player.r3Status.status != WinnedState.LOSED))
+    .map((player) => player.name);
+  vbcLog += '勝ち抜け ';
+  for (const name of winnerPlayersName) {
+    vbcLog += `[${name}]`;
+  }
+  vbcLog += '\n';
+  return vbcLog;
+}
+
+const operate10by10 = (players: PlayerEntity[], vbcLog: string) => {
+  let nWinnedPlayer = 0;
+  let nLosedPlayer = 0;
+  let time = 0;  // コース経過時間（秒）
+
+  while (nWinnedPlayer < 2  && nLosedPlayer < 3 && time < (15 * 60)) {
+    const result = QuizResultUtils.operateQuiz(
+      players, 
+      QuizResultUtils.calculateButtonPushProbabilityFor10by10, 
+      QuizResultUtils.calculateCorrectAnswerProbabilityFor10by10);
+
+    if (result.pushedPlayerIndex == -1) {
+      // 問題スルー
+      time += Random.getRandomArbitrary(12.5 - 4, 12.5 + 4);
+      vbcLog += `（スルー）\n`;
+      continue;
+    } else if (players[result.pushedPlayerIndex].r3Status.status != WinnedState.UNDEFINED) {
+      // その解答者が既に勝ち抜け or 敗退している
+      continue;
+    } else {
+      // 誰かが解答権を得ている
+      time += Random.getRandomArbitrary(12.5 - 4, 12.5 + 4);
+      vbcLog += `${players[result.pushedPlayerIndex].name} `;
+      if (result.isCorrected) {
+        // 正解した
+        vbcLog += `${AnswerState.CORRECT} `;
+        players[result.pushedPlayerIndex].r3Status.points++;
+        players[result.pushedPlayerIndex].r3Status.answered += AnswerState.CORRECT;
+
+        if ((players[result.pushedPlayerIndex].r3Status.points * (10 - players[result.pushedPlayerIndex].r3Status.misses)) >= 100) {
+          // 勝ち抜け
+          vbcLog += `=> ${getWinState(nWinnedPlayer)}`;
+          players[result.pushedPlayerIndex].r3Status.status = getWinState(nWinnedPlayer);
+          nWinnedPlayer++;
+        }
+      } else {
+        // 誤答した
+        vbcLog += `${AnswerState.INCORRECT} `;
+        players[result.pushedPlayerIndex].r3Status.misses += 1;
+        players[result.pushedPlayerIndex].r3Status.answered += AnswerState.INCORRECT;
+
+        if (players[result.pushedPlayerIndex].r3Status.misses == 10) {
+          // 敗退
+          vbcLog += `=> ${WinnedState.LOSED}`;
+          players[result.pushedPlayerIndex].r3Status.status = WinnedState.LOSED;
+          nLosedPlayer++;
+        }
+      }
+      vbcLog += '\n';
+    }
+  }
+
+  if (nWinnedPlayer < 2) {
+    // トビ残り処理
+    const remainedPlayers = players
+      .filter((player) => player.r3Status.status == WinnedState.UNDEFINED)
+      .sort((playerA, playerB) => {
+        if ((playerA.r3Status.points * (10 - playerA.r3Status.misses)) > 
+            (playerB.r3Status.points * (10 - playerB.r3Status.misses))) return -1; // 積ポイント多い順
+        return operatePlayOff(playerA, playerB) // プレーオフ
+      });
+    for (const player of remainedPlayers) {
+      // 勝ち抜け設定
+      player.r3Status.status = getWinState(nWinnedPlayer);
+    }
+  }
+
+  for (const player of players) {
+    player.r3Status.answered += ' （' + 
+      (player.r3Status.points * (10 - player.r3Status.misses)) + 'pts.）';
+  }
+
+  const winnerPlayersName = players
+    .filter((player) => (player.r3Status.status != WinnedState.UNDEFINED && player.r3Status.status != WinnedState.LOSED))
+    .map((player) => player.name);
+  vbcLog += '勝ち抜け ';
+  for (const name of winnerPlayersName) {
+    vbcLog += `[${name}]`;
+  }
+  vbcLog += '\n';
+  return vbcLog;
+}
+
+const operate10UpDown = (players: PlayerEntity[], vbcLog: string) => {
+  let nWinnedPlayer = 0;
+  let nLosedPlayer = 0;
+  let time = 0;  // コース経過時間（秒）
+
+  while (nWinnedPlayer < 2  && nLosedPlayer < 3 && time < (15 * 60)) {
+    const result = QuizResultUtils.operateQuiz(
+      players, 
+      undefined, 
+      QuizResultUtils.calculateCorrectAnswerProbabilityFor10UpDown);
+
+    if (result.pushedPlayerIndex == -1) {
+      // 問題スルー
+      time += Random.getRandomArbitrary(12.5 - 4, 12.5 + 4);
+      vbcLog += `（スルー）\n`;
+      continue;
+    } else if (players[result.pushedPlayerIndex].r3Status.status != WinnedState.UNDEFINED) {
+      // その解答者が既に勝ち抜け or 敗退している
+      continue;
+    } else {
+      // 誰かが解答権を得ている
+      time += Random.getRandomArbitrary(12.5 - 4, 12.5 + 4);
+      vbcLog += `${players[result.pushedPlayerIndex].name} `;
+      if (result.isCorrected) {
+        // 正解した
+        vbcLog += `${AnswerState.CORRECT} `;
+        players[result.pushedPlayerIndex].r3Status.points++;
+        players[result.pushedPlayerIndex].r3Status.answered += AnswerState.CORRECT;
+
+        if (players[result.pushedPlayerIndex].r3Status.points == 10) {
+          // 勝ち抜け
+          vbcLog += `=> ${getWinState(nWinnedPlayer)}`;
+          players[result.pushedPlayerIndex].r3Status.status = getWinState(nWinnedPlayer);
+          nWinnedPlayer++;
+        }
+      } else {
+        // 誤答した
+        vbcLog += `${AnswerState.INCORRECT} `;
+        players[result.pushedPlayerIndex].r3Status.misses += 1;
+        players[result.pushedPlayerIndex].r3Status.answered += AnswerState.INCORRECT;
+        // 10up-downは誤答したらポイントが0に戻る
+        players[result.pushedPlayerIndex].r3Status.points == 0;
+
+        if (players[result.pushedPlayerIndex].r3Status.misses == 2) {
+          // 敗退
+          vbcLog += `=> ${WinnedState.LOSED}`;
+          players[result.pushedPlayerIndex].r3Status.status = WinnedState.LOSED;
+          nLosedPlayer++;
+        }
+      }
+      vbcLog += '\n';
+    }
+  }
+
+  if (nWinnedPlayer < 2) {
+    // トビ残り処理
+    const remainedPlayers = players
+      .filter((player) => player.r3Status.status == WinnedState.UNDEFINED)
+      .sort((playerA, playerB) => {
+        if (playerA.r3Status.points > playerB.r3Status.points) return -1; // ポイント多い順
+        return operatePlayOff(playerA, playerB) // プレーオフ
+      });
+    for (const player of remainedPlayers) {
+      // 勝ち抜け設定
+      player.r3Status.status = getWinState(nWinnedPlayer);
+    }
+  }
+
+  for (const player of players) {
+    player.r3Status.answered += ` （${player.r3Status.points}pts.）`;
   }
 
   const winnerPlayersName = players
@@ -281,16 +452,17 @@ export default defineComponent({
           vbcLog = operate10o10x(getPlayersByCourse(runningCourseOrder[i]), vbcLog);
           break;
         case Round3Course.BY:
+          vbcLog = operate10by10(getPlayersByCourse(runningCourseOrder[i]), vbcLog);
           break;
         case Round3Course.SWEDISH:
           break;
         case Round3Course.UP_DOWN:
+          vbcLog = operate10UpDown(getPlayersByCourse(runningCourseOrder[i]), vbcLog);
           break;
         default:
           // ここを通ることは無い
       }
     }
-
 
     vbcLog += '【Round 3: Number 10 おわり】\n';
     console.log(vbcLog);
