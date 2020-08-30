@@ -87,7 +87,7 @@ const operateSet = (setNo: number, players: PlayerEntity[], vbcLog: string) => {
         } else {
           // 誤答した
           vbcLog += `${AnswerState.INCORRECT} `;
-          players[result.pushedPlayerIndex].sfStatus.points -= 1;
+          players[result.pushedPlayerIndex].sfStatus.misses += 1;
           players[result.pushedPlayerIndex].sfStatus.answered[0] += AnswerState.INCORRECT;
         }
       } else if (setNo == 2) {
@@ -100,7 +100,7 @@ const operateSet = (setNo: number, players: PlayerEntity[], vbcLog: string) => {
         } else {
           // 誤答した
           vbcLog += `${AnswerState.INCORRECT} `;
-          players[result.pushedPlayerIndex].sfStatus.points -= 2;
+          players[result.pushedPlayerIndex].sfStatus.misses += 2;
           players[result.pushedPlayerIndex].sfStatus.answered[1]+= AnswerState.INCORRECT;
         }
       } else {
@@ -113,7 +113,7 @@ const operateSet = (setNo: number, players: PlayerEntity[], vbcLog: string) => {
         } else {
           // 誤答した
           vbcLog += `${AnswerState.INCORRECT} `;
-          players[result.pushedPlayerIndex].sfStatus.points -= 2;
+          players[result.pushedPlayerIndex].sfStatus.misses += 2;
           players[result.pushedPlayerIndex].sfStatus.answered[2] += AnswerState.INCORRECT;
         }
       }
@@ -184,7 +184,7 @@ export default defineComponent({
     let vbcLog = '【Semi Final: 3セット制タイムレース Nine Hundred】\n';
     const semiFinalPlayers = props.playerList.filter((player) => {
       return player.sfStatus.seatIndex != -1;
-    })
+    });
 
     for (let i = 0; i < 3; i++) {
       vbcLog += `（第${i + 1}セット）\n`;

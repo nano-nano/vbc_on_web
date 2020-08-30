@@ -16,6 +16,7 @@ export interface PlayerEntity {
     r3Status: Round3Entity;
     exStatus: ExRoundEntity;
     sfStatus: SemiFinalEntity;
+    fStatus: FinalEntity;
 }
 
 export interface Round2Entity {
@@ -47,5 +48,18 @@ export interface SemiFinalEntity {
     points: number;     // 正解数
     misses: number;     // 誤答数
     answered: string[]; // 正誤履歴文字列（セットごとの配列）
+    status: string;     // 解答者ステータス
+}
+
+export interface FinalEntity {
+    set: FinalSetEntity[]; // セットごとの結果
+    nSeven: number,        // セット獲得数（nセブン）
+    isWin: boolean;          // 優勝フラグ
+}
+
+export interface FinalSetEntity {
+    points: number;     // 正解数
+    misses: number;     // 誤答数
+    answered: string;   // 正誤履歴文字列
     status: string;     // 解答者ステータス
 }

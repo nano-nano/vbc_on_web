@@ -4,6 +4,8 @@
 export const WinnedState = {
     /** 未確定 */
     UNDEFINED: '',
+    /** 順序指定無し勝ち抜け */
+    NON_ORDER_WINNED: '[Win]',
     /** 1抜け */
     FIRST_WINNED: '[1st]',
     /** 2抜け */

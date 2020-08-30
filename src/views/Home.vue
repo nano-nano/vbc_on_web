@@ -81,6 +81,18 @@
               </b-card-body>
             </b-collapse>
           </b-card>
+
+          <!-- F -->
+          <b-card no-body class="item-bottom-margin">
+            <b-card-header header-tag="header" class="p-1" role="tab">
+              <b-button block v-b-toggle.accordion-f variant="secondary">Final: トリプルセブン 結果</b-button>
+            </b-card-header>
+            <b-collapse id="accordion-f" role="tabpanel">
+              <b-card-body>
+                <FinalResult :playerList="state.playerdataList" />
+              </b-card-body>
+            </b-collapse>
+          </b-card>
         </div>
       </div>
     </div>
@@ -97,6 +109,7 @@ import Round2Result from '@/components/Home/2RResult.vue';
 import Round3Result from '@/components/Home/3RResult.vue';
 import ExRResult from '@/components/Home/ExRResult.vue';
 import SemiFinalResult from '@/components/Home/SFResult.vue';
+import FinalResult from '@/components/Home/FResult.vue';
 import { Observable, Observer } from 'rxjs';
 
 export default defineComponent({
@@ -108,6 +121,7 @@ export default defineComponent({
     Round3Result,
     ExRResult,
     SemiFinalResult,
+    FinalResult
   },
   setup() {
     const state = reactive<{

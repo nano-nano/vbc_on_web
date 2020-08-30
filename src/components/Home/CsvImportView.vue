@@ -14,9 +14,22 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, SetupContext, onUnmounted } from "@vue/composition-api";
-import { PlayerEntity, Round2Entity, Round3Entity, ExRoundEntity, SemiFinalEntity } from '@/vbc-entity'
+import { PlayerEntity, Round2Entity, Round3Entity, ExRoundEntity, SemiFinalEntity, FinalEntity, FinalSetEntity } from '@/vbc-entity'
 import { Observable } from 'rxjs';
 import { WinnedState, Round3Course } from '@/vbc-state';
+
+const createFinalSetEntities = () => {
+  const result = [];
+  for (let i = 0; i < 7; i++) {
+    result.push({
+      points: 0,
+      misses: 0,
+      answered: '',
+      status: WinnedState.UNDEFINED
+    } as FinalSetEntity);
+  }
+  return result;
+}
 
 const DEFAULT_FILE_NAME_STR = 'ファイル選択ボタンで選択するか、ここにファイルをドラッグ';
 
@@ -78,6 +91,11 @@ export default defineComponent({
             answered: ['', '', ''],
             status: WinnedState.UNDEFINED
           } as SemiFinalEntity,
+          fStatus: {
+            set: createFinalSetEntities(),
+            nSeven: 0,
+            isWin: false,
+          } as FinalEntity
         } as PlayerEntity);
       }
       return result;
