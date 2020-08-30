@@ -46,6 +46,6 @@ export interface SemiFinalEntity {
     seatIndex: number;  // 座席インデックス
     points: number;     // 正解数
     misses: number;     // 誤答数
-    answered: string;   // 正誤履歴文字列
+    answered: string[]; // 正誤履歴文字列（セットごとの配列）
     status: string;     // 解答者ステータス
 }

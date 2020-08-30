@@ -105,7 +105,7 @@ const calculateCorrectAnswerProbabilityFor2ndStep: CorrectAnswerProbabilityFunct
 
 const set2ndStepWinnedData = (player: PlayerEntity) => {
   player.exStatus.secondStepStatus = WinnedState.FIRST_WINNED;
-  player.sfStatus.seatIndex = 3; // 準決勝の座席indexは固定
+  player.sfStatus.seatIndex = 4; // 準決勝の座席indexは固定
 }
 
 type Props = {

@@ -75,7 +75,7 @@ export default defineComponent({
             seatIndex: -1,
             points: 0,
             misses: 0,
-            answered: '',
+            answered: ['', '', ''],
             status: WinnedState.UNDEFINED
           } as SemiFinalEntity,
         } as PlayerEntity);

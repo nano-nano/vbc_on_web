@@ -25,7 +25,7 @@
           <!-- ペーパー -->
           <b-card no-body class="item-bottom-margin">
             <b-card-header header-tag="header" class="p-1" role="tab">
-              <b-button block v-b-toggle.accordion-paper variant="secondary">Round 1: ペーパークイズ結果</b-button>
+              <b-button block v-b-toggle.accordion-paper variant="secondary">Round 1: ペーパークイズ 結果</b-button>
             </b-card-header>
             <b-collapse id="accordion-paper" visible role="tabpanel">
               <b-card-body>
@@ -37,7 +37,7 @@
           <!-- 2R -->
           <b-card no-body class="item-bottom-margin">
             <b-card-header header-tag="header" class="p-1" role="tab">
-              <b-button block v-b-toggle.accordion-r2 variant="secondary">Round 2: 連答つき５○２×結果</b-button>
+              <b-button block v-b-toggle.accordion-r2 variant="secondary">Round 2: 連答つき５○２× 結果</b-button>
             </b-card-header>
             <b-collapse id="accordion-r2" role="tabpanel">
               <b-card-body>
@@ -49,7 +49,7 @@
           <!-- 3R -->
           <b-card no-body class="item-bottom-margin">
             <b-card-header header-tag="header" class="p-1" role="tab">
-              <b-button block v-b-toggle.accordion-r3 variant="secondary">Round 3: Number 10結果</b-button>
+              <b-button block v-b-toggle.accordion-r3 variant="secondary">Round 3: Number 10 結果</b-button>
             </b-card-header>
             <b-collapse id="accordion-r3" role="tabpanel">
               <b-card-body>
@@ -61,11 +61,23 @@
           <!-- ExR -->
           <b-card no-body class="item-bottom-margin">
             <b-card-header header-tag="header" class="p-1" role="tab">
-              <b-button block v-b-toggle.accordion-ex variant="secondary">Extra Round: 敗者復活結果</b-button>
+              <b-button block v-b-toggle.accordion-ex variant="secondary">Extra Round: 敗者復活 結果</b-button>
             </b-card-header>
             <b-collapse id="accordion-ex" role="tabpanel">
               <b-card-body>
                 <ExRResult :playerList="state.playerdataList" />
+              </b-card-body>
+            </b-collapse>
+          </b-card>
+
+          <!-- SF -->
+          <b-card no-body class="item-bottom-margin">
+            <b-card-header header-tag="header" class="p-1" role="tab">
+              <b-button block v-b-toggle.accordion-sf variant="secondary">Semi Final: 3セット制タイムレース Nine Hundred 結果</b-button>
+            </b-card-header>
+            <b-collapse id="accordion-sf" role="tabpanel">
+              <b-card-body>
+                <SemiFinalResult :playerList="state.playerdataList" />
               </b-card-body>
             </b-collapse>
           </b-card>
@@ -84,6 +96,7 @@ import PaperResult from '@/components/Home/PaperResult.vue';
 import Round2Result from '@/components/Home/2RResult.vue';
 import Round3Result from '@/components/Home/3RResult.vue';
 import ExRResult from '@/components/Home/ExRResult.vue';
+import SemiFinalResult from '@/components/Home/SFResult.vue';
 import { Observable, Observer } from 'rxjs';
 
 export default defineComponent({
@@ -94,6 +107,7 @@ export default defineComponent({
     Round2Result,
     Round3Result,
     ExRResult,
+    SemiFinalResult,
   },
   setup() {
     const state = reactive<{

@@ -484,7 +484,7 @@ export default defineComponent({
   props: {
     playerList: {},
   },
-  setup(props: Props) {
+  setup(props: Props, context: SetupContext) {
     const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank);
     const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);
     const getWinnedStateLabelStyle = (state: string) => WinnedStateUtils.getWinnedStateLabelStyle(state);
@@ -576,9 +576,22 @@ export default defineComponent({
       }
     }
 
+    // 勝ち抜けたプレイヤーのSemi Final座席位置を決定する
+    for (let i = 0; i < runningCourseOrder.length; i++) {
+      getPlayersByCourse(runningCourseOrder[i])
+        .filter((player) => player.r3Status.status == WinnedState.FIRST_WINNED || player.r3Status.status == WinnedState.SECOND_WINNED)
+        .map((player) => {
+          if (player.r3Status.status == WinnedState.FIRST_WINNED) {
+            player.sfStatus.seatIndex = 3 - i;
+          } else {
+            player.sfStatus.seatIndex = 5 + i;
+          }
+          return player;
+        });
+    }
+
     vbcLog += '【Round 3: Number 10 おわり】\n';
-    // console.log(vbcLog);
-    // context.emit('onFinish3r', vbcLog);
+    context.emit('onFinish3r', vbcLog);
 
     return {
       props,
