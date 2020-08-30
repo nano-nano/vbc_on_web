@@ -14,6 +14,8 @@ export interface PlayerEntity {
 
     r2Status: Round2Entity;
     r3Status: Round3Entity;
+    exStatus: ExRoundEntity;
+    sfStatus: SemiFinalEntity;
 }
 
 export interface Round2Entity {
@@ -30,4 +32,20 @@ export interface Round3Entity {
     misses: number;                 // 誤答数
     answered: string;               // 正誤履歴文字列
     status: string;                 // 解答者ステータス
+}
+
+export interface ExRoundEntity {
+    firstStepStatus: string;    // First Step: 解答者ステータス
+    secondStepPoints: number;   // Second Step: 正解数
+    secondStepMisses: number;   // Second Step: 誤答数
+    secondStepAnswerd: string;  // Second Step: 正誤履歴文字列
+    secondStepStatus: string;   // Second Step: 解答者ステータス
+}
+
+export interface SemiFinalEntity {
+    seatIndex: number;  // 座席インデックス
+    points: number;     // 正解数
+    misses: number;     // 誤答数
+    answered: string;   // 正誤履歴文字列
+    status: string;     // 解答者ステータス
 }

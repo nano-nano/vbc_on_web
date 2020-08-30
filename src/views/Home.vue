@@ -57,6 +57,18 @@
               </b-card-body>
             </b-collapse>
           </b-card>
+
+          <!-- ExR -->
+          <b-card no-body class="item-bottom-margin">
+            <b-card-header header-tag="header" class="p-1" role="tab">
+              <b-button block v-b-toggle.accordion-ex variant="secondary">Extra Round: 敗者復活結果</b-button>
+            </b-card-header>
+            <b-collapse id="accordion-ex" role="tabpanel">
+              <b-card-body>
+                <ExRResult :playerList="state.playerdataList" />
+              </b-card-body>
+            </b-collapse>
+          </b-card>
         </div>
       </div>
     </div>
@@ -71,6 +83,7 @@ import CsvImportView from '@/components/Home/CsvImportView.vue';
 import PaperResult from '@/components/Home/PaperResult.vue';
 import Round2Result from '@/components/Home/2RResult.vue';
 import Round3Result from '@/components/Home/3RResult.vue';
+import ExRResult from '@/components/Home/ExRResult.vue';
 import { Observable, Observer } from 'rxjs';
 
 export default defineComponent({
@@ -80,6 +93,7 @@ export default defineComponent({
     PaperResult,
     Round2Result,
     Round3Result,
+    ExRResult,
   },
   setup() {
     const state = reactive<{

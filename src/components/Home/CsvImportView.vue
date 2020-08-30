@@ -14,7 +14,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, SetupContext, onUnmounted } from "@vue/composition-api";
-import { PlayerEntity, Round2Entity, Round3Entity } from '@/vbc-entity'
+import { PlayerEntity, Round2Entity, Round3Entity, ExRoundEntity, SemiFinalEntity } from '@/vbc-entity'
 import { Observable } from 'rxjs';
 import { WinnedState, Round3Course } from '@/vbc-state';
 
@@ -64,6 +64,20 @@ export default defineComponent({
             answered: '',
             status: WinnedState.UNDEFINED
           } as Round3Entity,
+          exStatus: {
+            firstStepStatus: WinnedState.UNDEFINED,
+            secondStepPoints: 0,
+            secondStepMisses: 0,
+            secondStepAnswerd: '',
+            secondStepStatus: WinnedState.UNDEFINED
+          } as ExRoundEntity,
+          sfStatus: {
+            seatIndex: -1,
+            points: 0,
+            misses: 0,
+            answered: '',
+            status: WinnedState.UNDEFINED
+          } as SemiFinalEntity,
         } as PlayerEntity);
       }
       return result;

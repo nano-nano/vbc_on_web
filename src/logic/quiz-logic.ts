@@ -10,7 +10,6 @@ export type OperateQuizResult = {
 };
 
 export class QuizResultUtils {
-
     static operateQuiz(
         playerList: PlayerEntity[],
         buttonPushProbabilityFunction: ButtonPushProbabilityFunction = this.calculateStandardButtonPushProbability,
@@ -224,5 +223,17 @@ export class QuizResultUtils {
 
         const remainMisses = 10 - player.r3Status.misses;
         return (remainMisses + missCount() - 1);
+    }
+
+    // Extra Round ==
+
+    /**
+     * 敗者復活 First Round用の問題難易度を返す  
+     * 返す値は問題番号（n問目）に応じて、おおよそ線形増加する
+     * 
+     * @param questionCount 問題番号（n問目）
+     */
+    static getQuestionDifficultyForExFirst(questionCount: number) {
+        return (questionCount / 1.8 + Random.getRandomArbitrary(-1, 1) + 2);
     }
 }
