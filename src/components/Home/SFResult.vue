@@ -125,8 +125,10 @@ const operateSet = (setNo: number, players: PlayerEntity[], vbcLog: string) => {
   const sortedPlayersInSet = players
     .filter((player) => player.sfStatus.status == WinnedState.UNDEFINED)
     .sort((playerA, playerB) => {
-        if ((playerA.sfStatus.points - playerA.sfStatus.misses) > (playerB.sfStatus.points - playerB.sfStatus.misses)) return -1; // ポイント多い順
-        return operatePlayOff(playerA, playerB) // プレーオフ
+      const playerAscore = playerA.sfStatus.points - playerA.sfStatus.misses;
+      const playerBscore = playerB.sfStatus.points - playerB.sfStatus.misses;
+        if (playerAscore != playerBscore) return (playerBscore - playerAscore); // （正解ポイント - 誤答ポイント）多い順
+        return operatePlayOff(playerA, playerB); // プレーオフ
     });
 
   // 上位1人が勝ち抜け
@@ -141,7 +143,10 @@ const operateSet = (setNo: number, players: PlayerEntity[], vbcLog: string) => {
 
   // 下位2人が敗退
   sortedPlayersInSet[sortedPlayersInSet.length - 1].sfStatus.status = WinnedState.LOSED;
-  sortedPlayersInSet[sortedPlayersInSet.length - 2].sfStatus.status = WinnedState.LOSED;
+  if (sortedPlayersInSet.length != 8) {
+    // 参加人数が8人の場合は2人目を決めない
+    sortedPlayersInSet[sortedPlayersInSet.length - 2].sfStatus.status = WinnedState.LOSED;
+  }
   vbcLog += `${sortedPlayersInSet[sortedPlayersInSet.length - 1].name}, ${sortedPlayersInSet[sortedPlayersInSet.length - 2].name} => ${WinnedState.LOSED}\n`;
 
   return vbcLog;
