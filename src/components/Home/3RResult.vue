@@ -174,7 +174,9 @@ const operate10o10x = (players: PlayerEntity[], vbcLog: string) => {
       .filter((player) => player.r3Status.status == WinnedState.UNDEFINED)
       .sort((playerA, playerB) => {
         if (playerA.r3Status.points > playerB.r3Status.points) return -1; // ポイント多い順
+        if (playerA.r3Status.points < playerB.r3Status.points) return 1;
         if (playerA.r3Status.misses < playerB.r3Status.misses) return -1; // 誤答少ない順
+        if (playerA.r3Status.misses > playerB.r3Status.misses) return 1;
         return operatePlayOff(playerA, playerB) // プレーオフ
       });
     for (let i = 0; i < (2 - nWinnedPlayer); i++) {
@@ -264,6 +266,8 @@ const operate10by10 = (players: PlayerEntity[], vbcLog: string) => {
       .sort((playerA, playerB) => {
         if ((playerA.r3Status.points * (10 - playerA.r3Status.misses)) > 
             (playerB.r3Status.points * (10 - playerB.r3Status.misses))) return -1; // 積ポイント多い順
+        if ((playerA.r3Status.points * (10 - playerA.r3Status.misses)) < 
+            (playerB.r3Status.points * (10 - playerB.r3Status.misses))) return 1;
         return operatePlayOff(playerA, playerB) // プレーオフ
       });
     const nRequiredWinner = (2 - nWinnedPlayer);
@@ -354,6 +358,7 @@ const operate10UpDown = (players: PlayerEntity[], vbcLog: string) => {
       .filter((player) => player.r3Status.status == WinnedState.UNDEFINED)
       .sort((playerA, playerB) => {
         if (playerA.r3Status.points > playerB.r3Status.points) return -1; // ポイント多い順
+        if (playerA.r3Status.points < playerB.r3Status.points) return 1;
         return operatePlayOff(playerA, playerB) // プレーオフ
       });
     const nRequiredWinner = (2 - nWinnedPlayer);
@@ -448,7 +453,9 @@ const operateSwedish10 = (players: PlayerEntity[], vbcLog: string) => {
       .filter((player) => player.r3Status.status == WinnedState.UNDEFINED)
       .sort((playerA, playerB) => {
         if (playerA.r3Status.points > playerB.r3Status.points) return -1; // ポイント多い順
+        if (playerA.r3Status.points < playerB.r3Status.points) return 1;
         if (playerA.r3Status.misses < playerB.r3Status.misses) return -1; // 誤答少ない順
+        if (playerA.r3Status.misses > playerB.r3Status.misses) return 1;
         return operatePlayOff(playerA, playerB) // プレーオフ
       });
     const nRequiredWinner = (2 - nWinnedPlayer);

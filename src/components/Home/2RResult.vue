@@ -180,7 +180,9 @@ export default defineComponent({
             .filter((player) => player.r2Status.status == WinnedState.UNDEFINED)
             .sort((playerA, playerB) => {
               if (playerA.r2Status.points > playerB.r2Status.points) return -1; // ポイント多い順
+              if (playerA.r2Status.points < playerB.r2Status.points) return 1;
               if (playerA.r2Status.misses < playerB.r2Status.misses) return -1; // 誤答少ない順
+              if (playerA.r2Status.misses > playerB.r2Status.misses) return 1;
               return playerA.paperRank - playerB.paperRank; // ペーパー上位順
             });
           for (const player of remainedPlayers) {
