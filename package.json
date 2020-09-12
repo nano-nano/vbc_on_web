@@ -1,7 +1,7 @@
 {
   "name": "vbc_on_web",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "private": false,
   "author": "nano-nano",
   "scripts": {
     "serve": "vue-cli-service serve",

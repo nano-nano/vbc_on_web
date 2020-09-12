@@ -2,7 +2,7 @@
   <div>
     <div v-for="(setData, idx) in finalSetResultData" :key="idx">
       <h4>第{{idx + 1}}セット</h4>
-      <table class="table" style="table-layout: fixed;">
+      <table class="table table-sm" style="table-layout: fixed;">
         <thead>
           <tr>
             <th 

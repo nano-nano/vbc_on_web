@@ -2,15 +2,11 @@
   <div>
     <h4>First Step: 読み上げ筆記クイズ</h4>
     <table class="table table-sm" v-for="(progress, idx) in firstStepProgressList" :key="idx">
-      <thead>
-        <tr>
-          <th colspan="2">
-            第 {{ progress.questionCount }} 問
-          </th>
-        </tr>
-      </thead>
       <tbody>
         <tr>
+          <td class="centering-td" style="width: 10%;">
+            第 {{ progress.questionCount }} 問
+          </td>
           <td class="centering-td">
             <small>{{ progress.answered }}</small>
           </td>

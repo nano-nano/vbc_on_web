@@ -2,7 +2,7 @@
   <div>
     <div v-for="(course, idx) in runningCourseOrder" :key="idx">
       <h4>コース{{ (idx + 1) }} : {{ course }}</h4>
-      <table class="table" style="table-layout: fixed;">
+      <table class="table table-sm" style="table-layout: fixed;">
         <thead>
           <tr>
             <th 
