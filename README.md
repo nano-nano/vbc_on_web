@@ -1,5 +1,7 @@
 # vbc on Web
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/18e4b68e-09db-4166-b0d0-efec7edba51a/deploy-status)](https://app.netlify.com/sites/vbc-on-web/deploys)
+
 ## これはなに？
 
 バーチャルにクイズ大会「abc」を再現できるPython3向けツール「vbc」にインスパイアを受け、  
