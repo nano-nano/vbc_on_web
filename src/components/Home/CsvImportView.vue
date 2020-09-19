@@ -56,12 +56,12 @@ export default defineComponent({
         result.push({
           paperRank: parseInt(lineItems[0]),
           name: lineItems[1],
-          knowledge: parseInt(lineItems[2]),
-          pushSpeed: parseInt(lineItems[3]),
-          request10o10x: parseInt(lineItems[4]),
-          requestSwedish10: parseInt(lineItems[5]),
-          request10by10: parseInt(lineItems[6]),
-          request10updown: parseInt(lineItems[7]),
+          knowledge: parseFloat(lineItems[2]),
+          pushSpeed: parseFloat(lineItems[3]),
+          request10o10x: parseFloat(lineItems[4]),
+          requestSwedish10: parseFloat(lineItems[5]),
+          request10by10: parseFloat(lineItems[6]),
+          request10updown: parseFloat(lineItems[7]),
           belonging: (lineItems[8] ? lineItems[8] : '-'),
           r2Status: {
             points: 0,
