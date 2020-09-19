@@ -2,7 +2,7 @@ import { WinnedState } from '@/vbc-state';
 
 export class NamePlateUtils {
     /**
-     * ペーパー順位に応じたネームプレート色を返す
+     * ペーパー順位に応じたネームプレート色のstyle classを返す
      * 
      * @param rank ペーパー順位
      */
@@ -15,7 +15,7 @@ export class NamePlateUtils {
     }
 
     /**
-     * ペーパー順位を序数テキストに変換して返します
+     * ペーパー順位を序数テキストに変換して返す
      * 
      * @param rank ペーパー順位
      */
@@ -30,6 +30,11 @@ export class NamePlateUtils {
 }
 
 export class WinnedStateUtils {
+    /**
+     * 勝ち抜き状態に応じたstyle classを返す
+     * 
+     * @param state WinnedState
+     */
     static getWinnedStateLabelStyle(state: string) {
         if (state == WinnedState.LOSED) return 'text-muted' ;
         if (state == WinnedState.UNDEFINED) return '' ;
@@ -46,8 +51,11 @@ export class Random {
     }
 
     /**
-     * 指定した値の間の乱数を返す
-     * 戻り値は min 以上、 max 未満
+     * 指定した値の間のランダムな実数を返す
+     * 戻り値はmin 以上、max 未満
+     * 
+     * @param min 最小値
+     * @param max 最大値
      */
     static getRandomArbitrary(min: number, max: number) {
         return Math.random() * (max - min) + min;
@@ -55,7 +63,10 @@ export class Random {
 
     /**
      * 指定した値の間のランダムな整数を返す
-     * 戻り値は min 以上（ min が整数でない場合、 min より大きい次の整数以上）、 max 未満
+     * 戻り値はmin 以上（min が整数でない場合、min より大きい次の整数以上）、max 未満
+     * 
+     * @param min 最小値
+     * @param max 最大値
      */
     static getRandomInt(min: number, max: number) {
         min = Math.ceil(min);

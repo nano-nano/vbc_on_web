@@ -34,6 +34,7 @@ export const WinnedStateOrder = [
     WinnedState.LOSED
 ];
 
+/** 正誤状態 */
 export const AnswerState = {
     /** 正解 */
     CORRECT: '○',
@@ -46,11 +47,17 @@ export const AnswerState = {
 } as const;
 type AnswerState = typeof AnswerState[keyof typeof AnswerState];
 
+/** Round3コース */
 export const Round3Course = {
+    /** コース未定義 */
     UNDEFINED: 'undefined',
+    /** 10○10✕ */
     OX: '10○10✕',
+    /** 10 by 10 */
     BY: '10 by 10',
+    /** Swedish 10 */
     SWEDISH: 'Swedish 10',
+    /** 10 up-down */
     UP_DOWN: '10 up-down',
 } as const;
 type Round3Course = typeof Round3Course[keyof typeof Round3Course];
