@@ -20,19 +20,7 @@
 
     <div v-if="isNeedSecondStep">
       <h4>Second Step: ５○１×クイズ</h4>
-      <table class="table" style="table-layout: fixed;">
-        <thead>
-          <tr>
-            <th 
-              v-for="(player, idx) in remainedPlayers"
-              :key="idx"
-              class="tate-th"
-              :class="getNamePlateClass(player)"
-            >
-              <span class="tate-span">{{ player.name }}</span>
-            </th>
-          </tr>
-        </thead>
+      <table class="table table-sm" style="table-layout: fixed;">
         <tbody>
           <tr>
             <td v-for="(player, idx) in remainedPlayers" :key="idx" class="centering-td" style="padding: 4px;">
@@ -43,6 +31,16 @@
             <td v-for="(player, idx) in remainedPlayers" :key="idx" class="centering-td">
               <small>{{ player.belonging }}</small>
             </td>
+          </tr>
+          <tr>
+            <th 
+              v-for="(player, idx) in remainedPlayers"
+              :key="idx"
+              class="tate-th"
+              :class="getNamePlateClass(player)"
+            >
+              <span class="tate-span">{{ player.name }}</span>
+            </th>
           </tr>
           <tr>
             <td v-for="(player, idx) in remainedPlayers" :key="idx" class="centering-td">

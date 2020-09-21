@@ -210,7 +210,7 @@ export default defineComponent({
   writing-mode: vertical-rl;
 }
 .tate-th {
-  vertical-align: auto;
+  vertical-align: middle;
   text-align: center;
 }
 

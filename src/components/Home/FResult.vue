@@ -3,18 +3,6 @@
     <div v-for="(setData, idx) in finalSetResultData" :key="idx">
       <h4>第{{idx + 1}}セット</h4>
       <table class="table table-sm" style="table-layout: fixed;">
-        <thead>
-          <tr>
-            <th 
-              v-for="(player, idx2) in setData"
-              :key="idx2"
-              class="tate-th"
-              :class="getNamePlateClass(player)"
-            >
-              <span class="tate-span">{{ player.name }}</span>
-            </th>
-          </tr>
-        </thead>
         <tbody>
           <tr>
             <td v-for="(player, idx2) in setData" :key="idx2" class="centering-td" style="padding: 4px;">
@@ -25,6 +13,16 @@
             <td v-for="(player, idx2) in setData" :key="idx2" class="centering-td">
               <small>{{ player.belonging }}</small>
             </td>
+          </tr>
+          <tr>
+            <th 
+              v-for="(player, idx2) in setData"
+              :key="idx2"
+              class="tate-th"
+              :class="getNamePlateClass(player)"
+            >
+              <span class="tate-span">{{ player.name }}</span>
+            </th>
           </tr>
           <tr>
             <td v-for="(player, idx2) in setData" :key="idx2" class="centering-td">
