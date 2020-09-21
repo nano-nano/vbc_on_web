@@ -3,18 +3,6 @@
     <div v-for="(players, idx) in setList" :key="idx">
       <h4>第{{ (idx + 1) }}セット</h4>
       <table class="table table-sm" style="table-layout: fixed;">
-        <thead>
-          <tr>
-            <th 
-              v-for="(player, idx2) in players"
-              :key="idx2"
-              class="tate-th"
-              :class="getNamePlateClass(player)"
-            >
-              <span class="tate-span">{{ player.name }}</span>
-            </th>
-          </tr>
-        </thead>
         <tbody>
           <tr>
             <td v-for="(player, idx2) in players" :key="idx2" class="centering-td" style="padding: 4px;">
@@ -25,6 +13,16 @@
             <td v-for="(player, idx2) in players" :key="idx2" class="centering-td">
               <small>{{ player.belonging }}</small>
             </td>
+          </tr>
+          <tr>
+            <th 
+              v-for="(player, idx2) in players"
+              :key="idx2"
+              class="tate-th"
+              :class="getNamePlateClass(player)"
+            >
+              <span class="tate-span">{{ player.name }}</span>
+            </th>
           </tr>
           <tr>
             <td v-for="(player, idx2) in players" :key="idx2" class="centering-td">
@@ -49,6 +47,10 @@ import { WinnedState, AnswerState } from '@/vbc-state';
 import { NamePlateUtils, WinnedStateUtils } from '@/logic/common-logic';
 import { QuizResultUtils } from '@/logic/quiz-logic';
 
+const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank);
+const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);
+const getWinnedStateLabelStyle = (state: string) => WinnedStateUtils.getWinnedStateLabelStyle(state);
+
 const getWinState = (nWinner: number) => {
   switch (nWinner) {
     case 0:
@@ -67,18 +69,19 @@ const getWinState = (nWinner: number) => {
 }
 
 const setAdvantageValue = (player: PlayerEntity) => {
+  const r2Status = player.r2Status;
   if (player.paperRank <= 4) {
-    player.r2Status.points = 3;
-      player.r2Status.answered = AnswerState.CORRECT_ADVANTAGE + AnswerState.CORRECT_ADVANTAGE + AnswerState.CORRECT_ADVANTAGE;
+      r2Status.points = 3;
+      r2Status.answered = AnswerState.CORRECT_ADVANTAGE + AnswerState.CORRECT_ADVANTAGE + AnswerState.CORRECT_ADVANTAGE;
     } else if (player.paperRank <= 12) {
-      player.r2Status.points = 2;
-      player.r2Status.answered = AnswerState.CORRECT_ADVANTAGE + AnswerState.CORRECT_ADVANTAGE;
+      r2Status.points = 2;
+      r2Status.answered = AnswerState.CORRECT_ADVANTAGE + AnswerState.CORRECT_ADVANTAGE;
     } else if (player.paperRank <= 24) {
-      player.r2Status.points = 1;
-      player.r2Status.answered = AnswerState.CORRECT_ADVANTAGE;
+      r2Status.points = 1;
+      r2Status.answered = AnswerState.CORRECT_ADVANTAGE;
     } else {
-      player.r2Status.points = 0;
-      player.r2Status.answered = '';
+      r2Status.points = 0;
+      r2Status.answered = '';
     }
 }
 
@@ -91,12 +94,9 @@ export default defineComponent({
     playerList: {},
   },
   setup(props: Props, context: SetupContext) {
-    const getNamePlateClass = (player: PlayerEntity) => NamePlateUtils.getBgColorClass(player.paperRank);
-    const convertRankNumberToText = (player: PlayerEntity) => NamePlateUtils.convertRankNumberToText(player.paperRank);
-    const getWinnedStateLabelStyle = (state: string) => WinnedStateUtils.getWinnedStateLabelStyle(state);
-
     let vbcLog = '【Round 2: 連答つき５○２×】\n';
     
+    // セットごとに振り分け
     const setList: PlayerEntity[][] = [[], [], [], []];
     for(let i = 0; i < 48; i++) {
       const player = props.playerList[i];
@@ -129,45 +129,45 @@ export default defineComponent({
           continue;
         } else {
           // 誰かが解答権を得ている
+          const targetStatus = set[result.pushedPlayerIndex].r2Status;
           vbcLog += `${set[result.pushedPlayerIndex].name} `;
           if (result.isCorrected) {
             // 正解した
             if (result.pushedPlayerIndex == currentCorrectPlayerIndex) {
               // 連答正解
               vbcLog += `${AnswerState.CORRECT_DOUBLE} `;
-              set[result.pushedPlayerIndex].r2Status.points
-                = Math.min(5, set[result.pushedPlayerIndex].r2Status.points + 2);
-              set[result.pushedPlayerIndex].r2Status.answered += AnswerState.CORRECT_DOUBLE;
+              targetStatus.points = Math.min(5, targetStatus.points + 2);
+              targetStatus.answered += AnswerState.CORRECT_DOUBLE;
             } else {
               // 通常正解
               vbcLog += `${AnswerState.CORRECT} `;
-              set[result.pushedPlayerIndex].r2Status.points += 1;
-              set[result.pushedPlayerIndex].r2Status.answered += AnswerState.CORRECT;
+              targetStatus.points += 1;
+              targetStatus.answered += AnswerState.CORRECT;
             }
             // 連答権セット
             currentCorrectPlayerIndex = result.pushedPlayerIndex;
   
-            if (set[result.pushedPlayerIndex].r2Status.points == 5) {
+            if (targetStatus.points == 5) {
               // 勝ち抜け
               vbcLog += `=> ${getWinState(nWinnedPlayer)}`;
-              set[result.pushedPlayerIndex].r2Status.status = getWinState(nWinnedPlayer);
+              targetStatus.status = getWinState(nWinnedPlayer);
               nWinnedPlayer++;
             }
             vbcLog += '\n';
           } else {
             // 誤答した
             vbcLog += `${AnswerState.INCORRECT} `;
-            set[result.pushedPlayerIndex].r2Status.misses += 1;
-            set[result.pushedPlayerIndex].r2Status.answered += AnswerState.INCORRECT;
+            targetStatus.misses += 1;
+            targetStatus.answered += AnswerState.INCORRECT;
             if (result.pushedPlayerIndex == currentCorrectPlayerIndex) {
               // 連答権リセット
               currentCorrectPlayerIndex = -1;
             }
   
-            if (set[result.pushedPlayerIndex].r2Status.misses == 2) {
+            if (targetStatus.misses == 2) {
               // 敗退
               vbcLog += `=> ${WinnedState.LOSED}`;
-              set[result.pushedPlayerIndex].r2Status.status = WinnedState.LOSED;
+              targetStatus.status = WinnedState.LOSED;
               nLosedPlayer++;
             }
             vbcLog += '\n';

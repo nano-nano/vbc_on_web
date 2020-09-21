@@ -13,7 +13,7 @@
 
         <!-- 未インポート時の案内 -->
         <div v-if="!state.isFileLoaded" class="item-bottom-margin alert alert-primary" role="alert">
-          参加者データの読み込み、演算が完了すると結果が下に表示されます
+          参加者データの読み込み、シミュレーションが完了すると結果が下に表示されます
         </div>
 
         <!-- インポート完了後の結果表示 -->
@@ -210,7 +210,7 @@ export default defineComponent({
   writing-mode: vertical-rl;
 }
 .tate-th {
-  vertical-align: top;
+  vertical-align: auto;
   text-align: center;
 }
 
