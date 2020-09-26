@@ -187,6 +187,8 @@ export default defineComponent({
     let vbcLog = '【Semi Final: 3セット制タイムレース Nine Hundred】\n';
     const semiFinalPlayers = props.playerList.filter((player) => {
       return player.sfStatus.seatIndex != -1;
+    }).sort((playerA, playerB) => {
+      return playerB.sfStatus.seatIndex - playerA.sfStatus.seatIndex;
     });
 
     for (let i = 0; i < 3; i++) {
