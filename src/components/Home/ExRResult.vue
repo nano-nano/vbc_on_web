@@ -223,7 +223,7 @@ export default defineComponent({
     vbcLog += '（Second Step おわり）\n';
     
     vbcLog += '【Extra Round: 敗者復活 おわり】\n';
-    context.emit('onFinishExr', vbcLog);
+    context.emit('onFinish', vbcLog);
 
     return {
       props,

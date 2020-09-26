@@ -206,7 +206,7 @@ export default defineComponent({
       }
     }
     vbcLog += '【Final: トリプルセブン おわり】\n';
-    context.emit('onFinishF', vbcLog);
+    context.emit('onFinish', vbcLog);
 
     return {
       props,

@@ -204,7 +204,7 @@ export default defineComponent({
     }
 
     vbcLog += '【Round 2: 連答つき５○２× おわり】\n';
-    context.emit('onFinish2r', vbcLog);
+    context.emit('onFinish', vbcLog);
 
     return {
       props,

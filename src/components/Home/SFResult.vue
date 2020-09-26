@@ -208,7 +208,7 @@ export default defineComponent({
     }
     
     vbcLog += '【Semi Final: 3セット制タイムレース Nine Hundred おわり】\n';
-    context.emit('onFinishSf', vbcLog);
+    context.emit('onFinish', vbcLog);
 
     return {
       props,

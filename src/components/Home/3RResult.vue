@@ -596,7 +596,7 @@ export default defineComponent({
     }
 
     vbcLog += '【Round 3: Number 10 おわり】\n';
-    context.emit('onFinish3r', vbcLog);
+    context.emit('onFinish', vbcLog);
 
     return {
       props,

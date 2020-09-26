@@ -16,7 +16,7 @@
           参加者データの読み込み、シミュレーションが完了すると結果が下に表示されます
         </div>
 
-        <!-- インポート完了後の結果表示 -->
+        <!-- インポート完了後の結果表示（ビジュアル表示） -->
         <div v-if="state.isFileLoaded">
           <div class="item-bottom-margin d-flex justify-content-end">
             <b-button variant="outline-secondary" class="ml-2" @click="onCaptureClicked">表示をキャプチャ</b-button>
@@ -43,7 +43,7 @@
               </b-card-header>
               <b-collapse id="accordion-r2" role="tabpanel">
                 <b-card-body>
-                  <Round2Result :playerList="state.playerdataList" @onFinish2r="onFinish2r" />
+                  <Round2Result :playerList="state.playerdataList" @onFinish="addVbcLog(0, $event)" />
                 </b-card-body>
               </b-collapse>
             </b-card>
@@ -55,7 +55,7 @@
               </b-card-header>
               <b-collapse id="accordion-r3" role="tabpanel">
                 <b-card-body>
-                  <Round3Result :playerList="state.playerdataList" />
+                  <Round3Result :playerList="state.playerdataList" @onFinish="addVbcLog(1, $event)" />
                 </b-card-body>
               </b-collapse>
             </b-card>
@@ -67,7 +67,7 @@
               </b-card-header>
               <b-collapse id="accordion-ex" role="tabpanel">
                 <b-card-body>
-                  <ExRResult :playerList="state.playerdataList" />
+                  <ExRResult :playerList="state.playerdataList" @onFinish="addVbcLog(2, $event)" />
                 </b-card-body>
               </b-collapse>
             </b-card>
@@ -79,7 +79,7 @@
               </b-card-header>
               <b-collapse id="accordion-sf" role="tabpanel">
                 <b-card-body>
-                  <SemiFinalResult :playerList="state.playerdataList" />
+                  <SemiFinalResult :playerList="state.playerdataList" @onFinish="addVbcLog(3, $event)" />
                 </b-card-body>
               </b-collapse>
             </b-card>
@@ -91,11 +91,16 @@
               </b-card-header>
               <b-collapse id="accordion-f" role="tabpanel">
                 <b-card-body>
-                  <FinalResult :playerList="state.playerdataList" />
+                  <FinalResult :playerList="state.playerdataList" @onFinish="addVbcLog(4, $event)" />
                 </b-card-body>
               </b-collapse>
             </b-card>
           </div>
+        </div>
+
+        <!-- インポート完了後の結果表示（ログ） -->
+        <div v-if="state.isFileLoaded">
+          <ResultLogView :vbcLogList="state.vbcLogList"/>
         </div>
       </div>
     </div>
@@ -117,6 +122,7 @@ import Round3Result from '@/components/Home/3RResult.vue';
 import ExRResult from '@/components/Home/ExRResult.vue';
 import SemiFinalResult from '@/components/Home/SFResult.vue';
 import FinalResult from '@/components/Home/FResult.vue';
+import ResultLogView from '@/components/Home/ResultLogView.vue';
 
 export default defineComponent({
   components: {
@@ -127,7 +133,8 @@ export default defineComponent({
     Round3Result,
     ExRResult,
     SemiFinalResult,
-    FinalResult
+    FinalResult,
+    ResultLogView
   },
   setup() {
     const state = reactive<{
@@ -180,8 +187,8 @@ export default defineComponent({
       });
     }
 
-    const onFinish2r = (logStr: string) => {
-      state.vbcLogList.push({ round: '2R', str: logStr });
+    const addVbcLog = (index: number, logStr: string) => {
+      state.vbcLogList.push({ index: index, str: logStr });
     }
 
     return {
@@ -190,7 +197,7 @@ export default defineComponent({
       onImportFileSelected,
       onClearClicked,
       onCaptureClicked,
-      onFinish2r
+      addVbcLog
     }
   }
 })
