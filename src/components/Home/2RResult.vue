@@ -88,15 +88,14 @@ const setAdvantageValue = (player: PlayerEntity) => {
 type Props = {
   playerList: PlayerEntity[];
 }
-  
 export default defineComponent({
   props: {
-    playerList: {},
+    playerList: { required: true },
   },
   setup(props: Props, context: SetupContext) {
     let vbcLog = '【Round 2: 連答つき５○２×】\n';
     
-    // セットごとに振り分け
+    // セットごとに参加者（ペーパー勝ち抜け48人）を振り分け
     const setList: PlayerEntity[][] = [[], [], [], []];
     for(let i = 0; i < 48; i++) {
       const player = props.playerList[i];
@@ -104,33 +103,36 @@ export default defineComponent({
       setList[i % 4].push(player);
     }
 
+    // セット実行
     for (let i = 0; i < setList.length; i++) {
       vbcLog += `（第${i + 1}セット）\n`;
 
-      const set = setList[i];
+      const setPlayers = setList[i];
       let nWinnedPlayer = 0;
       let nLosedPlayer = 0;
       let currentCorrectPlayerIndex = -1; // 連答権持ちプレイヤーのindex
 
-      for (const player of set) {
+      for (const player of setPlayers) {
         vbcLog += `[${player.name}]`;
       }
       vbcLog += '\n';
   
       while (nWinnedPlayer < 5  && nLosedPlayer < 7) {
         // クイズ実行
-        const result = QuizResultUtils.operateQuiz(set);
+        const result = QuizResultUtils.operateQuiz(setPlayers);
         if (result.pushedPlayerIndex == -1) {
           // 問題スルー
           vbcLog += `（スルー）\n`;
           continue;
-        } else if (set[result.pushedPlayerIndex].r2Status.status != WinnedState.UNDEFINED) {
-          // その解答者が既に勝ち抜け or 敗退している
-          continue;
         } else {
-          // 誰かが解答権を得ている
-          const targetStatus = set[result.pushedPlayerIndex].r2Status;
-          vbcLog += `${set[result.pushedPlayerIndex].name} `;
+          const targetPlayer = setPlayers[result.pushedPlayerIndex];
+          const targetStatus = targetPlayer.r2Status;
+          if (targetStatus.status != WinnedState.UNDEFINED) {
+            // その解答者が既に勝ち抜け or 敗退している
+            continue;
+          }
+
+          vbcLog += `${targetPlayer.name} `;
           if (result.isCorrected) {
             // 正解した
             if (result.pushedPlayerIndex == currentCorrectPlayerIndex) {
@@ -153,7 +155,6 @@ export default defineComponent({
               targetStatus.status = getWinState(nWinnedPlayer);
               nWinnedPlayer++;
             }
-            vbcLog += '\n';
           } else {
             // 誤答した
             vbcLog += `${AnswerState.INCORRECT} `;
@@ -170,13 +171,13 @@ export default defineComponent({
               targetStatus.status = WinnedState.LOSED;
               nLosedPlayer++;
             }
-            vbcLog += '\n';
           }
+          vbcLog += '\n';
         }
   
         if (nLosedPlayer == 7) {
           // トビ残り処理
-          const remainedPlayers = set
+          const remainedPlayers = setPlayers
             .filter((player) => player.r2Status.status == WinnedState.UNDEFINED)
             .sort((playerA, playerB) => {
               if (playerA.r2Status.points > playerB.r2Status.points) return -1; // ポイント多い順
@@ -193,7 +194,8 @@ export default defineComponent({
         }
       }
 
-      const winnerPlayersName = set
+      // 勝ち抜けプレイヤーログ出力
+      const winnerPlayersName = setPlayers
         .filter((player) => (player.r2Status.status != WinnedState.UNDEFINED && player.r2Status.status != WinnedState.LOSED))
         .map((player) => player.name);
       vbcLog += '勝ち抜け ';
@@ -207,7 +209,6 @@ export default defineComponent({
     context.emit('onFinish', vbcLog);
 
     return {
-      props,
       setList,
       getNamePlateClass,
       convertRankNumberToText,
